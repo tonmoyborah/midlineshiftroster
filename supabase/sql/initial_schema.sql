@@ -240,18 +240,30 @@ end;
 $$ language plpgsql security definer;
 
 -- Admin full access
-create policy if not exists "Admins full on clinics" on public.clinics for all to authenticated using (public.is_admin()) with check (public.is_admin());
-create policy if not exists "Admins full on staff" on public.staff for all to authenticated using (public.is_admin()) with check (public.is_admin());
-create policy if not exists "Admins full on staff_working_days" on public.staff_working_days for all to authenticated using (public.is_admin()) with check (public.is_admin());
-create policy if not exists "Admins full on leave_requests" on public.leave_requests for all to authenticated using (public.is_admin()) with check (public.is_admin());
-create policy if not exists "Admins full on shift_assignments" on public.shift_assignments for all to authenticated using (public.is_admin()) with check (public.is_admin());
-create policy if not exists "Admins full on unapproved_absences" on public.unapproved_absences for all to authenticated using (public.is_admin()) with check (public.is_admin());
-create policy if not exists "Admins read admin_users" on public.admin_users for select to authenticated using (public.is_admin());
+drop policy if exists "Admins full on clinics" on public.clinics;
+drop policy if exists "Admins full on staff" on public.staff;
+drop policy if exists "Admins full on staff_working_days" on public.staff_working_days;
+drop policy if exists "Admins full on leave_requests" on public.leave_requests;
+drop policy if exists "Admins full on shift_assignments" on public.shift_assignments;
+drop policy if exists "Admins full on unapproved_absences" on public.unapproved_absences;
+drop policy if exists "Admins read admin_users" on public.admin_users;
+drop policy if exists "Staff view self" on public.staff;
+drop policy if exists "Staff create own leave" on public.leave_requests;
+drop policy if exists "Staff view own leave" on public.leave_requests;
+
+-- Admin full access
+create policy "Admins full on clinics" on public.clinics for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "Admins full on staff" on public.staff for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "Admins full on staff_working_days" on public.staff_working_days for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "Admins full on leave_requests" on public.leave_requests for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "Admins full on shift_assignments" on public.shift_assignments for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "Admins full on unapproved_absences" on public.unapproved_absences for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "Admins read admin_users" on public.admin_users for select to authenticated using (public.is_admin());
 
 -- Staff limited access (view own and create their leaves)
-create policy if not exists "Staff view self" on public.staff for select to authenticated using (email = auth.jwt() ->> 'email');
-create policy if not exists "Staff create own leave" on public.leave_requests for insert to authenticated with check (staff_id in (select id from public.staff where email = auth.jwt() ->> 'email'));
-create policy if not exists "Staff view own leave" on public.leave_requests for select to authenticated using (staff_id in (select id from public.staff where email = auth.jwt() ->> 'email'));
+create policy "Staff view self" on public.staff for select to authenticated using (email = auth.jwt() ->> 'email');
+create policy "Staff create own leave" on public.leave_requests for insert to authenticated with check (staff_id in (select id from public.staff where email = auth.jwt() ->> 'email'));
+create policy "Staff view own leave" on public.leave_requests for select to authenticated using (staff_id in (select id from public.staff where email = auth.jwt() ->> 'email'));
 
 -- =============================
 -- Realtime publication
