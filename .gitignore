@@ -12,4 +12,10 @@ Desktop.ini
 *.log
 
 # Node/Yarn/NPM (non-invasive; safe even if unused)
-node_modules/ 
+node_modules/
+
+# Env files
+.env
+.env.*
+!.env.example
+.env.local 
