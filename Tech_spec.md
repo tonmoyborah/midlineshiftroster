@@ -52,4 +52,54 @@ midlineshiftroster/
 ## 9. Next Steps
 - Define the project’s language/runtime and initialize the build tooling.
 - Establish CI (linting, tests) once the stack is selected.
-- Update this `Tech_spec.md` to reflect stack-specific standards and folder structure. 
+- Update this `Tech_spec.md` to reflect stack-specific standards and folder structure.
+
+## 10. Product Specification (v1)
+
+A clean, minimal interface focused on showing a specific day's shift status, not a full calendar. No calendar grid, no dashboard — just a streamlined daily shift viewer and editor.
+
+### Staff Management
+- Add/edit staff
+  - Name
+  - Role (Doctor / Dental Assistant)
+  - Primary Clinic
+  - Standard working days (Mon–Sun flags)
+  - Weekly off day
+
+### View Shifts (Day-Wise Clinic-Centric View)
+- Select a date (defaults to today)
+- View all 3 clinics with assigned Doctor & DA for that date
+  - ⚠️ No staff (if no staff assigned)
+  - ✅ Present (regular duty)
+  - 🟡 Visiting (inter-branch)
+- Below, a list of the rest of the staff members with status indicators:
+  - ⚠️ Unapproved leave
+  - ❌ On weekly off
+  - 🟣 Approved leave
+- Optional note per staff (e.g., "Camp duty", "Late arrival")
+
+### Auto-Populate Shifts
+- Uses standard working days
+- Excludes approved leave
+- Applies inter-branch overrides
+- Ensures minimum staffing per clinic per day
+
+### Leave Management
+- Staff can request leave (date range, type: planned/emergency)
+- Admin can approve/reject
+- Approved leave removes staff from that day’s roster
+- Admin can add approved leave manually as well if staff are not able to request
+
+### Inter-Branch Assignment
+- Admin can assign a staff member to another clinic on a specific date
+- Overrides primary assignment and marks them as visiting
+
+### Manual Shift Override
+- Admin can edit Doctor or DA assigned for a clinic on a specific date
+- Dropdown selection from eligible staff
+- Add optional note
+
+### Filter & Navigation
+- Change date to view any past or future roster
+- Filter by:
+  - Clinic 
