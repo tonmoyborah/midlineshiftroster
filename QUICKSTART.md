@@ -74,31 +74,42 @@ Open your browser and go to: `http://localhost:5173`
 2. North Branch - Northside
 3. East Branch - Eastwood
 
-### Staff (8)
+### Staff (20)
 
-- **Doctors (4)**
+- **Doctors (10)**
 
   - Dr. Sarah Chen (Central Clinic)
-  - Dr. James Wilson (North Branch)
-  - Dr. Emily Brooks (East Branch)
   - Dr. Michael Smith (Central Clinic)
+  - Dr. Rachel Kim (Central Clinic) - On leave Sept 30 - Oct 1
+  - Dr. David Patel (Central Clinic)
+  - Dr. James Wilson (North Branch)
+  - Dr. Emily Brooks (North Branch)
+  - Dr. Kevin Lee (North Branch)
+  - Dr. Amanda Johnson (East Branch)
+  - Dr. Thomas Nguyen (East Branch)
+  - Dr. Linda Harris (East Branch)
 
-- **Dental Assistants (4)**
-  - Maya Patel (Central Clinic)
-  - Lisa Brown (North Branch) - Not active
-  - Tom Harris (East Branch)
+- **Dental Assistants (10)**
+  - Maya Patel (Central Clinic) - Pending leave Oct 5-6
+  - Jessica Wong (Central Clinic)
+  - Carlos Rivera (Central Clinic)
+  - Lisa Brown (North Branch) - On leave Oct 2-3
   - Anna Lee (North Branch)
+  - Robert Garcia (North Branch)
+  - Sophia Martinez (North Branch)
+  - Tom Harris (East Branch)
+  - Nicole Anderson (East Branch)
+  - Brian Taylor (East Branch)
 
 ### Shift Assignments (Oct 2, 2025)
 
-- Central Clinic: Dr. Sarah Chen + Maya Patel (Present)
-- North Branch: Dr. James Wilson only (No Staff Assigned)
-- East Branch: Dr. Emily Brooks + Tom Harris (Visiting)
+**NONE** - All clinics start empty. Users assign staff through the UI.
 
-### Leave Requests (2)
+### Leave Requests (3)
 
-1. Lisa Brown - Oct 2-3, 2025 (Pending, Planned)
-2. Anna Lee - Oct 1-5, 2025 (Approved, Emergency)
+1. Lisa Brown - Oct 2-3, 2025 (Approved, Planned)
+2. Dr. Rachel Kim - Sept 30 - Oct 1, 2025 (Approved, Planned)
+3. Maya Patel - Oct 5-6, 2025 (Pending, Planned)
 
 ## Navigation
 

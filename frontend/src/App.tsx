@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "./components/layout/Header";
 import { Navigation } from "./components/layout/Navigation";
 import { DailyShifts } from "./pages/DailyShifts";
@@ -7,17 +7,15 @@ import { LeaveManagement } from "./pages/LeaveManagement";
 
 type Page = "shifts" | "staff" | "leave";
 
-import { supabase } from './lib/supabase';
-
-const test = async () => {
-  const { data, error } = await supabase.from('clinics').select('*');
-  console.log('Clinics:', data, error);
-};
-
-test();
-
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("shifts");
+
+  // Uncomment to test Supabase connection on app load
+  useEffect(() => {
+    import('./lib/testConnection').then(({ testConnection }) => {
+      testConnection();
+    });
+  }, []);
 
   const renderPage = () => {
     switch (currentPage) {
