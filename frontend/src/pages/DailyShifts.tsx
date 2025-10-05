@@ -14,7 +14,7 @@ import {
 } from '../hooks/useShifts';
 import { useClinics } from '../hooks/useClinics';
 import { useStaff } from '../hooks/useStaff';
-import type { Clinic, Staff } from '../types/models';
+import type { Clinic } from '../types/models';
 
 export const DailyShifts: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date(2025, 9, 2)); // Oct 2, 2025
@@ -43,7 +43,7 @@ export const DailyShifts: React.FC = () => {
   const { data: allStaff, loading: staffLoading } = useStaff();
   const { assignStaff, loading: assigning } = useAssignStaff();
   const { removeAssignment, loading: removing } = useRemoveAssignment();
-  const { autoAssign, loading: autoAssigning } = useAutoAssignStaff();
+  const { autoAssign } = useAutoAssignStaff();
 
   const filteredRoster = filterClinic ? roster.filter((r) => r.clinic.id === filterClinic) : roster;
 
