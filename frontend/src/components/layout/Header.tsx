@@ -1,5 +1,6 @@
 import React from "react";
 import { Menu } from "lucide-react";
+import { UserMenu } from "../auth/UserMenu";
 
 interface HeaderProps {
   title: string;
@@ -21,6 +22,7 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
           )}
           <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
         </div>
+        <UserMenu />
       </div>
     </header>
   );

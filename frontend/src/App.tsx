@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { AuthProvider } from "./contexts/AuthContext";
+import { AuthGuard } from "./components/auth/AuthGuard";
 import { Header } from "./components/layout/Header";
 import { Navigation } from "./components/layout/Navigation";
 import { DailyShifts } from "./pages/DailyShifts";
@@ -31,11 +33,15 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header title="Shift Manager" />
-      <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
-      <main>{renderPage()}</main>
-    </div>
+    <AuthProvider>
+      <AuthGuard>
+        <div className="min-h-screen bg-gray-50">
+          <Header title="Shift Manager" />
+          <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
+          <main>{renderPage()}</main>
+        </div>
+      </AuthGuard>
+    </AuthProvider>
   );
 }
 
