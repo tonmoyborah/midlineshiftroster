@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { format } from 'date-fns';
 import { DateNavigator } from '../components/common/DateNavigator';
 import { FilterPanel } from '../components/common/FilterPanel';
 import { ClinicCard } from '../components/shifts/ClinicCard';
@@ -41,7 +42,7 @@ export const DailyShifts: React.FC = () => {
 
   // Debug logging for staff data
   console.log('DailyShifts Debug:', {
-    selectedDate: selectedDate.toISOString().split('T')[0],
+    selectedDate: format(selectedDate, 'yyyy-MM-dd'),
     allStaffCount: allStaff?.length || 0,
     staffLoading,
     unassignedStaffCount: unassignedStaff?.length || 0,

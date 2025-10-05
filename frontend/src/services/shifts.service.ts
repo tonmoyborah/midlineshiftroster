@@ -1,13 +1,13 @@
 import { supabase } from '../lib/supabase';
 import type { ShiftAssignment, ClinicRoster } from '../types/models';
-import { startOfDay } from 'date-fns';
+import { startOfDay, format } from 'date-fns';
 
 export class ShiftsService {
   /**
    * Get roster for a specific date using the database function
    */
   static async getRosterForDate(date: Date): Promise<ClinicRoster[]> {
-    const dateStr = startOfDay(date).toISOString().split('T')[0];
+    const dateStr = format(startOfDay(date), 'yyyy-MM-dd');
 
     const { data, error } = await supabase.rpc('get_clinic_roster_for_date', {
       p_date: dateStr,
@@ -60,7 +60,7 @@ export class ShiftsService {
    * Get all shift assignments for a specific date
    */
   static async getShiftAssignmentsForDate(date: Date): Promise<ShiftAssignment[]> {
-    const dateStr = startOfDay(date).toISOString().split('T')[0];
+    const dateStr = format(startOfDay(date), 'yyyy-MM-dd');
 
     const { data, error } = await supabase
       .from('shift_assignments')
@@ -95,7 +95,7 @@ export class ShiftsService {
    * Get unassigned staff for a specific date
    */
   static async getUnassignedStaffForDate(date: Date) {
-    const dateStr = startOfDay(date).toISOString().split('T')[0];
+    const dateStr = format(startOfDay(date), 'yyyy-MM-dd');
     const dayOfWeek = date.getDay();
 
     // Get all active staff
@@ -196,7 +196,7 @@ export class ShiftsService {
     date: Date,
     notes?: string,
   ): Promise<ShiftAssignment> {
-    const dateStr = startOfDay(date).toISOString().split('T')[0];
+    const dateStr = format(startOfDay(date), 'yyyy-MM-dd');
 
     // Check if staff is assigned to their primary clinic
     const { data: staff } = await supabase
@@ -236,7 +236,7 @@ export class ShiftsService {
    * Remove staff assignment
    */
   static async removeAssignment(clinicId: string, staffId: string, date: Date): Promise<void> {
-    const dateStr = startOfDay(date).toISOString().split('T')[0];
+    const dateStr = format(startOfDay(date), 'yyyy-MM-dd');
 
     const { error } = await supabase.from('shift_assignments').delete().match({
       clinic_id: clinicId,

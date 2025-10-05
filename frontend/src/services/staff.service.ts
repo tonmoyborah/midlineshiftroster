@@ -1,5 +1,6 @@
-import { supabase } from "../lib/supabase";
-import type { Staff } from "../types/models";
+import { supabase } from '../lib/supabase';
+import type { Staff } from '../types/models';
+import { format } from 'date-fns';
 
 export class StaffService {
   /**
@@ -7,7 +8,7 @@ export class StaffService {
    */
   static async getAllStaff(): Promise<Staff[]> {
     const { data, error } = await supabase
-      .from("staff")
+      .from('staff')
       .select(
         `
         *,
@@ -16,13 +17,13 @@ export class StaffService {
           name,
           location
         )
-      `
+      `,
       )
-      .eq("is_active", true)
-      .order("name");
+      .eq('is_active', true)
+      .order('name');
 
     if (error) {
-      console.error("Error fetching staff:", error);
+      console.error('Error fetching staff:', error);
       throw error;
     }
 
@@ -34,7 +35,7 @@ export class StaffService {
    */
   static async getStaffById(id: string): Promise<Staff | null> {
     const { data, error } = await supabase
-      .from("staff")
+      .from('staff')
       .select(
         `
         *,
@@ -43,13 +44,13 @@ export class StaffService {
           name,
           location
         )
-      `
+      `,
       )
-      .eq("id", id)
+      .eq('id', id)
       .single();
 
     if (error) {
-      console.error("Error fetching staff:", error);
+      console.error('Error fetching staff:', error);
       throw error;
     }
 
@@ -59,18 +60,16 @@ export class StaffService {
   /**
    * Get staff by role
    */
-  static async getStaffByRole(
-    role: "doctor" | "dental_assistant"
-  ): Promise<Staff[]> {
+  static async getStaffByRole(role: 'doctor' | 'dental_assistant'): Promise<Staff[]> {
     const { data, error } = await supabase
-      .from("staff")
-      .select("*")
-      .eq("role", role)
-      .eq("is_active", true)
-      .order("name");
+      .from('staff')
+      .select('*')
+      .eq('role', role)
+      .eq('is_active', true)
+      .order('name');
 
     if (error) {
-      console.error("Error fetching staff by role:", error);
+      console.error('Error fetching staff by role:', error);
       throw error;
     }
 
@@ -80,17 +79,11 @@ export class StaffService {
   /**
    * Create new staff member
    */
-  static async createStaff(
-    staff: Omit<Staff, "id" | "created_at" | "updated_at">
-  ): Promise<Staff> {
-    const { data, error } = await supabase
-      .from("staff")
-      .insert(staff)
-      .select()
-      .single();
+  static async createStaff(staff: Omit<Staff, 'id' | 'created_at' | 'updated_at'>): Promise<Staff> {
+    const { data, error } = await supabase.from('staff').insert(staff).select().single();
 
     if (error) {
-      console.error("Error creating staff:", error);
+      console.error('Error creating staff:', error);
       throw error;
     }
 
@@ -102,17 +95,17 @@ export class StaffService {
    */
   static async updateStaff(
     id: string,
-    updates: Partial<Omit<Staff, "id" | "created_at" | "updated_at">>
+    updates: Partial<Omit<Staff, 'id' | 'created_at' | 'updated_at'>>,
   ): Promise<Staff> {
     const { data, error } = await supabase
-      .from("staff")
+      .from('staff')
       .update(updates)
-      .eq("id", id)
+      .eq('id', id)
       .select()
       .single();
 
     if (error) {
-      console.error("Error updating staff:", error);
+      console.error('Error updating staff:', error);
       throw error;
     }
 
@@ -123,13 +116,10 @@ export class StaffService {
    * Delete staff (soft delete by setting is_active to false)
    */
   static async deleteStaff(id: string): Promise<void> {
-    const { error } = await supabase
-      .from("staff")
-      .update({ is_active: false })
-      .eq("id", id);
+    const { error } = await supabase.from('staff').update({ is_active: false }).eq('id', id);
 
     if (error) {
-      console.error("Error deleting staff:", error);
+      console.error('Error deleting staff:', error);
       throw error;
     }
   }
@@ -137,23 +127,19 @@ export class StaffService {
   /**
    * Get staff status for a specific date using DB function
    */
-  static async getStaffStatusForDate(
-    staffId: string,
-    date: Date
-  ): Promise<string> {
-    const dateStr = date.toISOString().split("T")[0];
+  static async getStaffStatusForDate(staffId: string, date: Date): Promise<string> {
+    const dateStr = format(date, 'yyyy-MM-dd');
 
-    const { data, error } = await supabase.rpc("get_staff_status_for_date", {
+    const { data, error } = await supabase.rpc('get_staff_status_for_date', {
       p_staff_id: staffId,
       p_date: dateStr,
     });
 
     if (error) {
-      console.error("Error fetching staff status:", error);
+      console.error('Error fetching staff status:', error);
       throw error;
     }
 
-    return data || "available";
+    return data || 'available';
   }
 }
-
