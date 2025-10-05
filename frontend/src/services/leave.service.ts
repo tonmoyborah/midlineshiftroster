@@ -1,5 +1,5 @@
-import { supabase } from "../lib/supabase";
-import type { LeaveRequest } from "../types/models";
+import { supabase } from '../lib/supabase';
+import type { LeaveRequest } from '../types/models';
 
 export class LeaveService {
   /**
@@ -7,7 +7,7 @@ export class LeaveService {
    */
   static async getAllLeaveRequests(): Promise<LeaveRequest[]> {
     const { data, error } = await supabase
-      .from("leave_requests")
+      .from('leave_requests')
       .select(
         `
         *,
@@ -17,12 +17,12 @@ export class LeaveService {
           role,
           email
         )
-      `
+      `,
       )
-      .order("created_at", { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (error) {
-      console.error("Error fetching leave requests:", error);
+      console.error('Error fetching leave requests:', error);
       throw error;
     }
 
@@ -33,10 +33,10 @@ export class LeaveService {
    * Get leave requests by status
    */
   static async getLeaveRequestsByStatus(
-    status: "pending" | "approved" | "rejected"
+    status: 'pending' | 'approved' | 'rejected',
   ): Promise<LeaveRequest[]> {
     const { data, error } = await supabase
-      .from("leave_requests")
+      .from('leave_requests')
       .select(
         `
         *,
@@ -46,13 +46,13 @@ export class LeaveService {
           role,
           email
         )
-      `
+      `,
       )
-      .eq("status", status)
-      .order("created_at", { ascending: false });
+      .eq('status', status)
+      .order('created_at', { ascending: false });
 
     if (error) {
-      console.error("Error fetching leave requests:", error);
+      console.error('Error fetching leave requests:', error);
       throw error;
     }
 
@@ -62,17 +62,15 @@ export class LeaveService {
   /**
    * Get leave requests for a specific staff member
    */
-  static async getLeaveRequestsByStaff(
-    staffId: string
-  ): Promise<LeaveRequest[]> {
+  static async getLeaveRequestsByStaff(staffId: string): Promise<LeaveRequest[]> {
     const { data, error } = await supabase
-      .from("leave_requests")
-      .select("*")
-      .eq("staff_id", staffId)
-      .order("start_date", { ascending: false });
+      .from('leave_requests')
+      .select('*')
+      .eq('staff_id', staffId)
+      .order('start_date', { ascending: false });
 
     if (error) {
-      console.error("Error fetching staff leave requests:", error);
+      console.error('Error fetching staff leave requests:', error);
       throw error;
     }
 
@@ -83,16 +81,16 @@ export class LeaveService {
    * Create a new leave request
    */
   static async createLeaveRequest(
-    leaveRequest: Omit<LeaveRequest, "id" | "created_at" | "updated_at">
+    leaveRequest: Omit<LeaveRequest, 'id' | 'created_at' | 'updated_at'>,
   ): Promise<LeaveRequest> {
     const { data, error } = await supabase
-      .from("leave_requests")
+      .from('leave_requests')
       .insert(leaveRequest)
       .select()
       .single();
 
     if (error) {
-      console.error("Error creating leave request:", error);
+      console.error('Error creating leave request:', error);
       throw error;
     }
 
@@ -104,19 +102,17 @@ export class LeaveService {
    */
   static async updateLeaveRequest(
     id: string,
-    updates: Partial<
-      Omit<LeaveRequest, "id" | "staff_id" | "created_at" | "updated_at">
-    >
+    updates: Partial<Omit<LeaveRequest, 'id' | 'staff_id' | 'created_at' | 'updated_at'>>,
   ): Promise<LeaveRequest> {
     const { data, error } = await supabase
-      .from("leave_requests")
+      .from('leave_requests')
       .update(updates)
-      .eq("id", id)
+      .eq('id', id)
       .select()
       .single();
 
     if (error) {
-      console.error("Error updating leave request:", error);
+      console.error('Error updating leave request:', error);
       throw error;
     }
 
@@ -128,23 +124,23 @@ export class LeaveService {
    */
   static async approveLeaveRequest(
     id: string,
-    approvedBy: string,
-    notes?: string
+    approvedBy: string | null,
+    notes?: string,
   ): Promise<LeaveRequest> {
     const { data, error } = await supabase
-      .from("leave_requests")
+      .from('leave_requests')
       .update({
-        status: "approved",
+        status: 'approved',
         approved_by: approvedBy,
         approved_at: new Date().toISOString(),
         notes: notes || null,
       })
-      .eq("id", id)
+      .eq('id', id)
       .select()
       .single();
 
     if (error) {
-      console.error("Error approving leave request:", error);
+      console.error('Error approving leave request:', error);
       throw error;
     }
 
@@ -156,23 +152,23 @@ export class LeaveService {
    */
   static async rejectLeaveRequest(
     id: string,
-    rejectedBy: string,
-    notes?: string
+    rejectedBy: string | null,
+    notes?: string,
   ): Promise<LeaveRequest> {
     const { data, error } = await supabase
-      .from("leave_requests")
+      .from('leave_requests')
       .update({
-        status: "rejected",
+        status: 'rejected',
         approved_by: rejectedBy,
         approved_at: new Date().toISOString(),
         notes: notes || null,
       })
-      .eq("id", id)
+      .eq('id', id)
       .select()
       .single();
 
     if (error) {
-      console.error("Error rejecting leave request:", error);
+      console.error('Error rejecting leave request:', error);
       throw error;
     }
 
@@ -183,10 +179,10 @@ export class LeaveService {
    * Delete leave request
    */
   static async deleteLeaveRequest(id: string): Promise<void> {
-    const { error } = await supabase.from("leave_requests").delete().eq("id", id);
+    const { error } = await supabase.from('leave_requests').delete().eq('id', id);
 
     if (error) {
-      console.error("Error deleting leave request:", error);
+      console.error('Error deleting leave request:', error);
       throw error;
     }
   }
@@ -197,21 +193,20 @@ export class LeaveService {
   static async hasApprovedLeave(
     staffId: string,
     startDate: string,
-    endDate: string
+    endDate: string,
   ): Promise<boolean> {
     const { data, error } = await supabase
-      .from("leave_requests")
-      .select("id")
-      .eq("staff_id", staffId)
-      .eq("status", "approved")
+      .from('leave_requests')
+      .select('id')
+      .eq('staff_id', staffId)
+      .eq('status', 'approved')
       .or(`start_date.lte.${endDate},end_date.gte.${startDate}`);
 
     if (error) {
-      console.error("Error checking leave:", error);
+      console.error('Error checking leave:', error);
       return false;
     }
 
     return (data?.length || 0) > 0;
   }
 }
-

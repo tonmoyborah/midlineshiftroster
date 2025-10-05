@@ -1,10 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
-import { LeaveService } from "../services/leave.service";
-import type { LeaveRequest } from "../types/models";
+import { useState, useEffect, useCallback } from 'react';
+import { LeaveService } from '../services/leave.service';
+import type { LeaveRequest } from '../types/models';
 
-export const useLeaveRequests = (
-  statusFilter?: "all" | "pending" | "approved" | "rejected"
-) => {
+export const useLeaveRequests = (statusFilter?: 'all' | 'pending' | 'approved' | 'rejected') => {
   const [data, setData] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -14,7 +12,7 @@ export const useLeaveRequests = (
       setLoading(true);
       setError(null);
       let requests;
-      if (statusFilter === "all" || !statusFilter) {
+      if (statusFilter === 'all' || !statusFilter) {
         requests = await LeaveService.getAllLeaveRequests();
       } else {
         requests = await LeaveService.getLeaveRequestsByStatus(statusFilter);
@@ -22,7 +20,7 @@ export const useLeaveRequests = (
       setData(requests);
     } catch (err) {
       setError(err as Error);
-      console.error("Error fetching leave requests:", err);
+      console.error('Error fetching leave requests:', err);
     } finally {
       setLoading(false);
     }
@@ -40,7 +38,7 @@ export const useCreateLeaveRequest = () => {
   const [error, setError] = useState<Error | null>(null);
 
   const createLeaveRequest = async (
-    leaveRequest: Omit<LeaveRequest, "id" | "created_at" | "updated_at">
+    leaveRequest: Omit<LeaveRequest, 'id' | 'created_at' | 'updated_at'>,
   ) => {
     try {
       setLoading(true);
@@ -49,7 +47,7 @@ export const useCreateLeaveRequest = () => {
       return newRequest;
     } catch (err) {
       setError(err as Error);
-      console.error("Error creating leave request:", err);
+      console.error('Error creating leave request:', err);
       return null;
     } finally {
       setLoading(false);
@@ -63,23 +61,15 @@ export const useApproveLeave = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const approveLeave = async (
-    id: string,
-    approvedBy: string,
-    notes?: string
-  ) => {
+  const approveLeave = async (id: string, approvedBy: string | null, notes?: string) => {
     try {
       setLoading(true);
       setError(null);
-      const approved = await LeaveService.approveLeaveRequest(
-        id,
-        approvedBy,
-        notes
-      );
+      const approved = await LeaveService.approveLeaveRequest(id, approvedBy, notes);
       return approved;
     } catch (err) {
       setError(err as Error);
-      console.error("Error approving leave:", err);
+      console.error('Error approving leave:', err);
       return null;
     } finally {
       setLoading(false);
@@ -93,23 +83,15 @@ export const useRejectLeave = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const rejectLeave = async (
-    id: string,
-    rejectedBy: string,
-    notes?: string
-  ) => {
+  const rejectLeave = async (id: string, rejectedBy: string | null, notes?: string) => {
     try {
       setLoading(true);
       setError(null);
-      const rejected = await LeaveService.rejectLeaveRequest(
-        id,
-        rejectedBy,
-        notes
-      );
+      const rejected = await LeaveService.rejectLeaveRequest(id, rejectedBy, notes);
       return rejected;
     } catch (err) {
       setError(err as Error);
-      console.error("Error rejecting leave:", err);
+      console.error('Error rejecting leave:', err);
       return null;
     } finally {
       setLoading(false);
@@ -131,7 +113,7 @@ export const useDeleteLeaveRequest = () => {
       return true;
     } catch (err) {
       setError(err as Error);
-      console.error("Error deleting leave request:", err);
+      console.error('Error deleting leave request:', err);
       return false;
     } finally {
       setLoading(false);
@@ -140,4 +122,3 @@ export const useDeleteLeaveRequest = () => {
 
   return { deleteLeaveRequest, loading, error };
 };
-

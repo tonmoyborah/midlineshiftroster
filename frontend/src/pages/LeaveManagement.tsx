@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { Calendar, Check, X, Clock } from "lucide-react";
-import { format } from "date-fns";
-import { useLeaveRequests, useApproveLeave, useRejectLeave } from "../hooks/useLeave";
+import React, { useState } from 'react';
+import { Calendar, Check, X, Clock } from 'lucide-react';
+import { format } from 'date-fns';
+import { useLeaveRequests, useApproveLeave, useRejectLeave } from '../hooks/useLeave';
 
-type LeaveStatus = "all" | "pending" | "approved" | "rejected";
+type LeaveStatus = 'all' | 'pending' | 'approved' | 'rejected';
 
 export const LeaveManagement: React.FC = () => {
-  const [statusFilter, setStatusFilter] = useState<LeaveStatus>("all");
+  const [statusFilter, setStatusFilter] = useState<LeaveStatus>('all');
 
   const { data: leaveRequests, loading, error, refetch } = useLeaveRequests(statusFilter);
   const { approveLeave, loading: approving } = useApproveLeave();
@@ -14,16 +14,16 @@ export const LeaveManagement: React.FC = () => {
 
   const getStaffName = (request: any) => {
     // The staff info is populated via the join in the service
-    return request.staff?.name || "Unknown";
+    return request.staff?.name || 'Unknown';
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "approved":
+      case 'approved':
         return <Check className="w-4 h-4 text-green-600" />;
-      case "rejected":
+      case 'rejected':
         return <X className="w-4 h-4 text-red-600" />;
-      case "pending":
+      case 'pending':
         return <Clock className="w-4 h-4 text-yellow-600" />;
       default:
         return null;
@@ -32,22 +32,23 @@ export const LeaveManagement: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "approved":
-        return "bg-green-100 text-green-700";
-      case "rejected":
-        return "bg-red-100 text-red-700";
-      case "pending":
-        return "bg-yellow-100 text-yellow-700";
+      case 'approved':
+        return 'bg-green-100 text-green-700';
+      case 'rejected':
+        return 'bg-red-100 text-red-700';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-700';
       default:
-        return "bg-gray-100 text-gray-700";
+        return 'bg-gray-100 text-gray-700';
     }
   };
 
   const handleApprove = async (id: string) => {
     // TODO: Get actual admin user ID from auth
-    const adminId = "00000000-0000-0000-0000-000000000000";
-    const result = await approveLeave(id, adminId, "Approved by admin");
-    
+    // Using null for now since we don't have authentication set up
+    const adminId = null;
+    const result = await approveLeave(id, adminId, 'Approved by admin');
+
     if (result) {
       refetch();
     }
@@ -55,13 +56,16 @@ export const LeaveManagement: React.FC = () => {
 
   const handleReject = async (id: string) => {
     // TODO: Get actual admin user ID from auth
-    const adminId = "00000000-0000-0000-0000-000000000000";
-    const result = await rejectLeave(id, adminId, "Rejected by admin");
-    
+    // Using null for now since we don't have authentication set up
+    const adminId = null;
+    const result = await rejectLeave(id, adminId, 'Rejected by admin');
+
     if (result) {
       refetch();
     }
   };
+
+  console.log('Leave requests here:', leaveRequests);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -69,37 +73,32 @@ export const LeaveManagement: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Calendar className="w-6 h-6 text-gray-700" />
-            <h1 className="text-xl font-semibold text-gray-900">
-              Leave Management
-            </h1>
+            <h1 className="text-xl font-semibold text-gray-900">Leave Management</h1>
           </div>
         </div>
 
         {/* Status Filter */}
         <div className="mb-4 flex gap-2">
-          {(["all", "pending", "approved", "rejected"] as LeaveStatus[]).map(
-            (status) => (
-              <button
-                key={status}
-                onClick={() => setStatusFilter(status)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  statusFilter === status
-                    ? "bg-gray-900 text-white"
-                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-                }`}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
-            )
-          )}
+          {(['all', 'pending', 'approved', 'rejected'] as LeaveStatus[]).map((status) => (
+            <button
+              key={status}
+              onClick={() => setStatusFilter(status)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                statusFilter === status
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+              }`}
+            >
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </button>
+          ))}
         </div>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
             <p className="font-medium">Error loading leave requests</p>
             <p className="text-sm">{error.message}</p>
-            <button
-              onClick={refetch}
-              className="mt-2 text-sm font-medium underline">
+            <button onClick={refetch} className="mt-2 text-sm font-medium underline">
               Try again
             </button>
           </div>
@@ -111,7 +110,8 @@ export const LeaveManagement: React.FC = () => {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="bg-white rounded-xl border border-gray-200 px-4 py-4 animate-pulse">
+                className="bg-white rounded-xl border border-gray-200 px-4 py-4 animate-pulse"
+              >
                 <div className="h-6 bg-gray-200 rounded w-1/3 mb-3"></div>
                 <div className="space-y-2">
                   <div className="h-4 bg-gray-200 rounded w-full"></div>
@@ -131,7 +131,8 @@ export const LeaveManagement: React.FC = () => {
               leaveRequests.map((request) => (
                 <div
                   key={request.id}
-                  className="bg-white rounded-xl border border-gray-200 px-4 py-4">
+                  className="bg-white rounded-xl border border-gray-200 px-4 py-4"
+                >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-gray-900 mb-1">
@@ -140,16 +141,14 @@ export const LeaveManagement: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span
                           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                            request.status
-                          )}`}>
+                            request.status,
+                          )}`}
+                        >
                           {getStatusIcon(request.status)}
-                          {request.status.charAt(0).toUpperCase() +
-                            request.status.slice(1)}
+                          {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                         </span>
                         <span className="text-xs text-gray-500">
-                          {request.leave_type === "planned"
-                            ? "📅 Planned"
-                            : "🚨 Emergency"}
+                          {request.leave_type === 'planned' ? '📅 Planned' : '🚨 Emergency'}
                         </span>
                       </div>
                     </div>
@@ -157,37 +156,37 @@ export const LeaveManagement: React.FC = () => {
 
                   <div className="space-y-2 text-sm text-gray-600">
                     <p>
-                      <span className="font-medium">Period:</span>{" "}
-                      {format(new Date(request.start_date), "MMM d, yyyy")} -{" "}
-                      {format(new Date(request.end_date), "MMM d, yyyy")}
+                      <span className="font-medium">Period:</span>{' '}
+                      {format(new Date(request.start_date), 'MMM d, yyyy')} -{' '}
+                      {format(new Date(request.end_date), 'MMM d, yyyy')}
                     </p>
                     {request.reason && (
                       <p>
-                        <span className="font-medium">Reason:</span>{" "}
-                        {request.reason}
+                        <span className="font-medium">Reason:</span> {request.reason}
                       </p>
                     )}
                     {request.notes && (
                       <p>
-                        <span className="font-medium">Notes:</span>{" "}
-                        {request.notes}
+                        <span className="font-medium">Notes:</span> {request.notes}
                       </p>
                     )}
                   </div>
 
-                  {request.status === "pending" && (
+                  {request.status === 'pending' && (
                     <div className="flex gap-2 mt-4">
                       <button
                         onClick={() => handleApprove(request.id)}
                         disabled={approving}
-                        className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
-                        {approving ? "Approving..." : "Approve"}
+                        className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {approving ? 'Approving...' : 'Approve'}
                       </button>
                       <button
                         onClick={() => handleReject(request.id)}
                         disabled={rejecting}
-                        className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
-                        {rejecting ? "Rejecting..." : "Reject"}
+                        className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {rejecting ? 'Rejecting...' : 'Reject'}
                       </button>
                     </div>
                   )}
