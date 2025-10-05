@@ -28,28 +28,29 @@ export class ShiftsService {
           location: row.clinic_location || '',
           is_active: true,
         },
-        doctor: row.doctor_id
-          ? {
-              id: row.doctor_id,
-              name: row.doctor_name,
+        // Parse JSONB arrays from database
+        doctors: Array.isArray(row.doctors)
+          ? row.doctors.map((doc: any) => ({
+              id: doc.id,
+              name: doc.name,
               email: '',
               role: 'doctor' as const,
               primary_clinic_id: row.clinic_id,
               weekly_off_day: null,
               is_active: true,
-            }
-          : null,
-        dental_assistant: row.da_id
-          ? {
-              id: row.da_id,
-              name: row.da_name,
+            }))
+          : [],
+        dental_assistants: Array.isArray(row.dental_assistants)
+          ? row.dental_assistants.map((da: any) => ({
+              id: da.id,
+              name: da.name,
               email: '',
               role: 'dental_assistant' as const,
               primary_clinic_id: row.clinic_id,
               weekly_off_day: null,
               is_active: true,
-            }
-          : null,
+            }))
+          : [],
         status: row.status,
         notes: row.notes,
       })) || []
@@ -270,5 +271,27 @@ export class ShiftsService {
     }
 
     return data;
+  }
+
+  /**
+   * Auto-assign all available staff to their primary clinics for a specific date
+   */
+  static async autoAssignStaffToPrimaryClinics(date: Date): Promise<{
+    assigned_count: number;
+    skipped_count: number;
+    message: string;
+  }> {
+    const dateStr = format(date, 'yyyy-MM-dd');
+
+    const { data, error } = await supabase.rpc('auto_assign_staff_to_primary_clinics', {
+      p_date: dateStr,
+    });
+
+    if (error) {
+      console.error('Error auto-assigning staff:', error);
+      throw error;
+    }
+
+    return data[0] || { assigned_count: 0, skipped_count: 0, message: 'No staff assigned' };
   }
 }

@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
-import { ShiftsService } from "../services/shifts.service";
-import type { ClinicRoster, ShiftAssignment } from "../types/models";
+import { useState, useEffect, useCallback } from 'react';
+import { ShiftsService } from '../services/shifts.service';
+import type { ClinicRoster, ShiftAssignment } from '../types/models';
 
 export const useRosterForDate = (date: Date) => {
   const [data, setData] = useState<ClinicRoster[]>([]);
@@ -15,7 +15,7 @@ export const useRosterForDate = (date: Date) => {
       setData(roster);
     } catch (err) {
       setError(err as Error);
-      console.error("Error fetching roster:", err);
+      console.error('Error fetching roster:', err);
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,7 @@ export const useShiftAssignments = (date: Date) => {
       setData(assignments);
     } catch (err) {
       setError(err as Error);
-      console.error("Error fetching assignments:", err);
+      console.error('Error fetching assignments:', err);
     } finally {
       setLoading(false);
     }
@@ -67,7 +67,7 @@ export const useUnassignedStaff = (date: Date) => {
       setData(unassigned);
     } catch (err) {
       setError(err as Error);
-      console.error("Error fetching unassigned staff:", err);
+      console.error('Error fetching unassigned staff:', err);
     } finally {
       setLoading(false);
     }
@@ -84,12 +84,7 @@ export const useAssignStaff = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const assignStaff = async (
-    clinicId: string,
-    staffId: string,
-    date: Date,
-    notes?: string
-  ) => {
+  const assignStaff = async (clinicId: string, staffId: string, date: Date, notes?: string) => {
     try {
       setLoading(true);
       setError(null);
@@ -97,7 +92,7 @@ export const useAssignStaff = () => {
       return true;
     } catch (err) {
       setError(err as Error);
-      console.error("Error assigning staff:", err);
+      console.error('Error assigning staff:', err);
       return false;
     } finally {
       setLoading(false);
@@ -111,11 +106,7 @@ export const useRemoveAssignment = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const removeAssignment = async (
-    clinicId: string,
-    staffId: string,
-    date: Date
-  ) => {
+  const removeAssignment = async (clinicId: string, staffId: string, date: Date) => {
     try {
       setLoading(true);
       setError(null);
@@ -123,7 +114,7 @@ export const useRemoveAssignment = () => {
       return true;
     } catch (err) {
       setError(err as Error);
-      console.error("Error removing assignment:", err);
+      console.error('Error removing assignment:', err);
       return false;
     } finally {
       setLoading(false);
@@ -133,3 +124,24 @@ export const useRemoveAssignment = () => {
   return { removeAssignment, loading, error };
 };
 
+export const useAutoAssignStaff = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const autoAssign = async (date: Date) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await ShiftsService.autoAssignStaffToPrimaryClinics(date);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      console.error('Error auto-assigning staff:', err);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { autoAssign, loading, error };
+};

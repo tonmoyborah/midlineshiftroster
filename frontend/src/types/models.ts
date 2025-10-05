@@ -9,7 +9,7 @@ export interface Staff {
   id: string;
   email: string;
   name: string;
-  role: "doctor" | "dental_assistant";
+  role: 'doctor' | 'dental_assistant';
   primary_clinic_id: string | null;
   weekly_off_day: number | null; // 0=Sunday, 6=Saturday
   is_active: boolean;
@@ -27,9 +27,9 @@ export interface LeaveRequest {
   staff_id: string;
   start_date: string;
   end_date: string;
-  leave_type: "planned" | "emergency";
+  leave_type: 'planned' | 'emergency';
   reason: string | null;
-  status: "pending" | "approved" | "rejected";
+  status: 'pending' | 'approved' | 'rejected';
   notes: string | null;
 }
 
@@ -44,19 +44,19 @@ export interface ShiftAssignment {
 
 export interface ClinicRoster {
   clinic: Clinic;
-  doctor: Staff | null;
-  dental_assistant: Staff | null;
-  status: "present" | "visiting" | "no_staff";
+  doctors: Staff[]; // Changed from single to array
+  dental_assistants: Staff[]; // Changed from single to array
+  status: 'present' | 'visiting' | 'no_staff';
   notes: string | null;
 }
 
 export type StaffStatus =
-  | "present"
-  | "visiting"
-  | "weekly_off"
-  | "approved_leave"
-  | "unapproved_leave"
-  | "available";
+  | 'present'
+  | 'visiting'
+  | 'weekly_off'
+  | 'approved_leave'
+  | 'unapproved_leave'
+  | 'available';
 
 export interface StaffWithStatus extends Staff {
   status: StaffStatus;
