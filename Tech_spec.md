@@ -70,7 +70,7 @@ CREATE TABLE staff (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email VARCHAR(255) UNIQUE NOT NULL,
   name VARCHAR(255) NOT NULL,
-  role VARCHAR(50) NOT NULL CHECK (role IN ('doctor', 'dental_assistant')),
+  role VARCHAR(50) NOT NULL CHECK (role IN ('doctor', 'dental_assistant', 'admin')),
   primary_clinic_id UUID REFERENCES clinics(id) ON DELETE SET NULL,
   weekly_off_day INTEGER CHECK (weekly_off_day >= 0 AND weekly_off_day <= 6), -- 0=Sunday, 6=Saturday
   is_active BOOLEAN DEFAULT true,
@@ -1591,7 +1591,7 @@ export interface Staff {
   id: string;
   email: string;
   name: string;
-  role: 'doctor' | 'dental_assistant';
+  role: 'doctor' | 'dental_assistant' | 'admin';
   primary_clinic_id: string | null;
   weekly_off_day: number | null;
   is_active: boolean;

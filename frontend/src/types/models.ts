@@ -9,7 +9,7 @@ export interface Staff {
   id: string;
   email: string;
   name: string;
-  role: 'doctor' | 'dental_assistant';
+  role: 'doctor' | 'dental_assistant' | 'admin';
   primary_clinic_id: string | null;
   weekly_off_day: number | null; // 0=Sunday, 6=Saturday
   is_active: boolean;

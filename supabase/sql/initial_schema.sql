@@ -23,7 +23,7 @@ create table if not exists public.staff (
 	id uuid primary key default gen_random_uuid(),
 	email varchar(255) unique not null,
 	name varchar(255) not null,
-	role varchar(50) not null check (role in ('doctor','dental_assistant')),
+	role varchar(50) not null check (role in ('doctor','dental_assistant','admin')),
 	primary_clinic_id uuid references public.clinics(id) on delete set null,
 	weekly_off_day integer check (weekly_off_day >= 0 and weekly_off_day <= 6),
 	is_active boolean default true,

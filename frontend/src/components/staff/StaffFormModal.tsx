@@ -22,7 +22,7 @@ export const StaffFormModal: React.FC<StaffFormModalProps> = ({
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    role: 'doctor' as 'doctor' | 'dental_assistant',
+    role: 'doctor' as 'doctor' | 'dental_assistant' | 'admin',
     primary_clinic_id: '',
     weekly_off_day: 0,
     is_active: true,
@@ -66,7 +66,7 @@ export const StaffFormModal: React.FC<StaffFormModalProps> = ({
       newErrors.email = 'Invalid email format';
     }
 
-    if (!formData.primary_clinic_id) {
+    if (!formData.primary_clinic_id && formData.role !== 'admin') {
       newErrors.primary_clinic_id = 'Primary clinic is required';
     }
 
@@ -148,32 +148,37 @@ export const StaffFormModal: React.FC<StaffFormModalProps> = ({
             <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
             <select
               value={formData.role}
-              onChange={(e) =>
+              onChange={(e) => {
+                const newRole = e.target.value as 'doctor' | 'dental_assistant' | 'admin';
                 setFormData({
                   ...formData,
-                  role: e.target.value as 'doctor' | 'dental_assistant',
-                })
-              }
+                  role: newRole,
+                  primary_clinic_id: newRole === 'admin' ? '' : formData.primary_clinic_id,
+                });
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               disabled={isLoading}
             >
               <option value="doctor">Doctor</option>
               <option value="dental_assistant">Dental Assistant</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
 
           {/* Primary Clinic */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Primary Clinic *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Primary Clinic {formData.role !== 'admin' ? '*' : ''}
+            </label>
             <select
               value={formData.primary_clinic_id}
               onChange={(e) => setFormData({ ...formData, primary_clinic_id: e.target.value })}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
                 errors.primary_clinic_id ? 'border-red-500' : 'border-gray-300'
               }`}
-              disabled={isLoading}
+              disabled={isLoading || formData.role === 'admin'}
             >
-              <option value="">Select a clinic</option>
+              <option value="">{formData.role === 'admin' ? 'Not applicable for admin' : 'Select a clinic'}</option>
               {clinics.map((clinic) => (
                 <option key={clinic.id} value={clinic.id}>
                   {clinic.name}
