@@ -17,8 +17,9 @@ export const Navigation: React.FC<NavigationProps> = ({
   ] as const;
 
   return (
-    <nav className="bg-white border-b border-gray-200 px-4">
-      <div className="flex gap-1">
+    <nav className="bg-white border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex gap-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = currentPage === item.id;
@@ -37,6 +38,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             </button>
           );
         })}
+        </div>
       </div>
     </nav>
   );

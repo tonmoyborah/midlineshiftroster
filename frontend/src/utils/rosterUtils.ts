@@ -4,49 +4,53 @@ import { formatDateISO, getDayOfWeek } from './dateUtils';
 
 export const getRosterForDate = (date: Date): ClinicRoster[] => {
   const dateStr = formatDateISO(date);
-  // const dayOfWeek = getDayOfWeek(date); // Not used in this function
 
   return clinics.map((clinic) => {
     const clinicAssignments = shiftAssignments.filter(
       (sa) => sa.clinic_id === clinic.id && sa.shift_date === dateStr,
     );
 
-    const doctorAssignment = clinicAssignments.find((sa) => {
-      const staffMember = staff.find((s) => s.id === sa.staff_id);
-      return staffMember?.role === 'doctor';
-    });
+    // Get all doctors assigned to this clinic
+    const doctors = clinicAssignments
+      .filter((sa) => {
+        const staffMember = staff.find((s) => s.id === sa.staff_id);
+        return staffMember?.role === 'doctor';
+      })
+      .map((sa) => {
+        const staffMember = staff.find((s) => s.id === sa.staff_id);
+        // If assigned, they are either present or visiting
+        const status: StaffStatus = sa.is_visiting ? 'visiting' : 'present';
+        return {
+          id: sa.staff_id,
+          name: staffMember?.name || 'Unknown',
+          status: status,
+          is_visiting: sa.is_visiting,
+        };
+      });
 
-    const daAssignment = clinicAssignments.find((sa) => {
-      const staffMember = staff.find((s) => s.id === sa.staff_id);
-      return staffMember?.role === 'dental_assistant';
-    });
-
-    const doctor = doctorAssignment
-      ? staff.find((s) => s.id === doctorAssignment.staff_id) || null
-      : null;
-
-    const dental_assistant = daAssignment
-      ? staff.find((s) => s.id === daAssignment.staff_id) || null
-      : null;
-
-    let status: 'present' | 'visiting' | 'no_staff' = 'no_staff';
-
-    if (doctor || dental_assistant) {
-      const hasVisiting =
-        doctorAssignment?.is_visiting || false || daAssignment?.is_visiting || false;
-      status = hasVisiting ? 'visiting' : 'present';
-    }
-
-    if (!doctor || !dental_assistant) {
-      status = 'no_staff';
-    }
+    // Get all dental assistants assigned to this clinic
+    const dental_assistants = clinicAssignments
+      .filter((sa) => {
+        const staffMember = staff.find((s) => s.id === sa.staff_id);
+        return staffMember?.role === 'dental_assistant';
+      })
+      .map((sa) => {
+        const staffMember = staff.find((s) => s.id === sa.staff_id);
+        // If assigned, they are either present or visiting
+        const status: StaffStatus = sa.is_visiting ? 'visiting' : 'present';
+        return {
+          id: sa.staff_id,
+          name: staffMember?.name || 'Unknown',
+          status: status,
+          is_visiting: sa.is_visiting,
+        };
+      });
 
     return {
       clinic,
-      doctors: doctor ? [doctor] : [],
-      dental_assistants: dental_assistant ? [dental_assistant] : [],
-      status,
-      notes: doctorAssignment?.notes || daAssignment?.notes || null,
+      doctors,
+      dental_assistants,
+      notes: clinicAssignments.find((sa) => sa.notes)?.notes || null,
     };
   });
 };
@@ -56,8 +60,19 @@ export const getStaffStatus = (staffId: string, date: Date): StaffStatus => {
   const dayOfWeek = getDayOfWeek(date);
   const staffMember = staff.find((s) => s.id === staffId);
 
-  if (!staffMember) return 'available';
+  if (!staffMember) return 'unapproved_leave'; // Staff not found = unapproved absence
 
+  // Check if assigned to any clinic first
+  const assignment = shiftAssignments.find(
+    (sa) => sa.staff_id === staffId && sa.shift_date === dateStr,
+  );
+
+  if (assignment) {
+    // If assigned, they are either present or visiting (not on leave)
+    return assignment.is_visiting ? 'visiting' : 'present';
+  }
+
+  // If not assigned, check leave statuses
   // Check weekly off
   if (staffMember.weekly_off_day === dayOfWeek) {
     return 'weekly_off';
@@ -89,16 +104,7 @@ export const getStaffStatus = (staffId: string, date: Date): StaffStatus => {
     return 'unapproved_leave';
   }
 
-  // Check if assigned
-  const assignment = shiftAssignments.find(
-    (sa) => sa.staff_id === staffId && sa.shift_date === dateStr,
-  );
-
-  if (assignment) {
-    return assignment.is_visiting ? 'visiting' : 'present';
-  }
-
-  return 'available';
+  return 'unapproved_leave'; // Not assigned and no leave = unapproved absence
 };
 
 export const getUnassignedStaffForDate = (date: Date): StaffWithStatus[] => {

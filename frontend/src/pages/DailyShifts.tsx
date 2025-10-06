@@ -153,7 +153,7 @@ export const DailyShifts: React.FC = () => {
         />
       )}
 
-      <div className="px-4 py-5 space-y-4">
+      <div className="py-5 space-y-4">
         <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wide px-1">
           Clinic Roster
         </h2>

@@ -38,7 +38,9 @@ function App() {
         <div className="min-h-screen bg-gray-50">
           <Header title="Shift Manager" />
           <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
-          <main>{renderPage()}</main>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <main>{renderPage()}</main>
+          </div>
         </div>
       </AuthGuard>
     </AuthProvider>

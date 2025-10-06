@@ -1,15 +1,9 @@
 import React from "react";
 import { Check, AlertTriangle, ArrowRight, X, Circle } from "lucide-react";
+import type { StaffStatus } from "../../types/models";
 
 interface StatusBadgeProps {
-  status:
-    | "present"
-    | "visiting"
-    | "no_staff"
-    | "weekly_off"
-    | "approved_leave"
-    | "unapproved_leave"
-    | "available";
+  status: StaffStatus;
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
@@ -30,14 +24,6 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
           bgColor: "bg-orange-50",
           textColor: "text-orange-700",
           iconColor: "text-orange-600",
-        };
-      case "no_staff":
-        return {
-          icon: AlertTriangle,
-          text: "No Staff Assigned",
-          bgColor: "bg-red-50",
-          textColor: "text-red-700",
-          iconColor: "text-red-600",
         };
       case "weekly_off":
         return {
@@ -62,14 +48,6 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
           bgColor: "bg-yellow-50",
           textColor: "text-yellow-700",
           iconColor: "text-yellow-600",
-        };
-      case "available":
-        return {
-          icon: Circle,
-          text: "Available",
-          bgColor: "bg-blue-50",
-          textColor: "text-blue-700",
-          iconColor: "text-blue-600",
         };
       default:
         return {

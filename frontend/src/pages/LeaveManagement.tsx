@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Calendar, Check, X, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { useLeaveRequests, useApproveLeave, useRejectLeave } from '../hooks/useLeave';
+import { useAuthContext } from '../contexts/AuthContext';
 
 type LeaveStatus = 'all' | 'pending' | 'approved' | 'rejected';
 
 export const LeaveManagement: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<LeaveStatus>('all');
+  const { user } = useAuthContext();
 
   const { data: leaveRequests, loading, error, refetch } = useLeaveRequests(statusFilter);
   const { approveLeave, loading: approving } = useApproveLeave();
@@ -44,24 +46,42 @@ export const LeaveManagement: React.FC = () => {
   };
 
   const handleApprove = async (id: string) => {
-    // TODO: Get actual admin user ID from auth
-    // Using null for now since we don't have authentication set up
-    const adminId = null;
-    const result = await approveLeave(id, adminId, 'Approved by admin');
+    console.log('Attempting to approve leave request with ID:', id);
+    console.log('Current user:', user);
+    console.log('User ID:', user?.id);
+    
+    const adminId = user?.id || null;
+    console.log('Using admin ID:', adminId);
+    
+    try {
+      const result = await approveLeave(id, adminId, 'Approved by admin');
+      console.log('Approval result:', result);
 
-    if (result) {
-      refetch();
+      if (result) {
+        refetch();
+      }
+    } catch (error) {
+      console.error('Error in handleApprove:', error);
     }
   };
 
   const handleReject = async (id: string) => {
-    // TODO: Get actual admin user ID from auth
-    // Using null for now since we don't have authentication set up
-    const adminId = null;
-    const result = await rejectLeave(id, adminId, 'Rejected by admin');
+    console.log('Attempting to reject leave request with ID:', id);
+    console.log('Current user:', user);
+    console.log('User ID:', user?.id);
+    
+    const adminId = user?.id || null;
+    console.log('Using admin ID:', adminId);
+    
+    try {
+      const result = await rejectLeave(id, adminId, 'Rejected by admin');
+      console.log('Rejection result:', result);
 
-    if (result) {
-      refetch();
+      if (result) {
+        refetch();
+      }
+    } catch (error) {
+      console.error('Error in handleReject:', error);
     }
   };
 
@@ -69,7 +89,7 @@ export const LeaveManagement: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="px-4 py-4">
+      <div className="py-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Calendar className="w-6 h-6 text-gray-700" />

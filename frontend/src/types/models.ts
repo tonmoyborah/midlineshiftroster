@@ -30,7 +30,11 @@ export interface LeaveRequest {
   leave_type: 'planned' | 'emergency';
   reason: string | null;
   status: 'pending' | 'approved' | 'rejected';
+  approved_by: string | null;
+  approved_at: string | null;
   notes: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ShiftAssignment {
@@ -42,11 +46,17 @@ export interface ShiftAssignment {
   notes: string | null;
 }
 
+export interface StaffInRoster {
+  id: string;
+  name: string;
+  status: StaffStatus;
+  is_visiting: boolean;
+}
+
 export interface ClinicRoster {
   clinic: Clinic;
-  doctors: Staff[]; // Changed from single to array
-  dental_assistants: Staff[]; // Changed from single to array
-  status: 'present' | 'visiting' | 'no_staff';
+  doctors: StaffInRoster[]; // Individual staff with statuses
+  dental_assistants: StaffInRoster[]; // Individual staff with statuses
   notes: string | null;
 }
 
@@ -55,8 +65,7 @@ export type StaffStatus =
   | 'visiting'
   | 'weekly_off'
   | 'approved_leave'
-  | 'unapproved_leave'
-  | 'available';
+  | 'unapproved_leave';
 
 export interface StaffWithStatus extends Staff {
   status: StaffStatus;
