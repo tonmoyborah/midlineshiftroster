@@ -127,24 +127,52 @@ export class LeaveService {
     approvedBy: string | null,
     notes?: string,
   ): Promise<LeaveRequest> {
+    console.log('Approving leave request with ID:', id);
+    console.log('Approved by:', approvedBy);
+    console.log('Notes:', notes);
+    
+    // First, check if the leave request exists
+    const { data: existingRequest, error: fetchError } = await supabase
+      .from('leave_requests')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (fetchError) {
+      console.error('Error fetching leave request:', fetchError);
+      throw new Error(`Leave request with ID ${id} not found`);
+    }
+    
+    console.log('Found existing leave request:', existingRequest);
+    
+    const updateData = {
+      status: 'approved',
+      approved_by: approvedBy,
+      approved_at: new Date().toISOString(),
+      notes: notes || null,
+    };
+    
+    console.log('Update data:', updateData);
+    
+    // Try the update without .single() first to see if it works
     const { data, error } = await supabase
       .from('leave_requests')
-      .update({
-        status: 'approved',
-        approved_by: approvedBy,
-        approved_at: new Date().toISOString(),
-        notes: notes || null,
-      })
+      .update(updateData)
       .eq('id', id)
-      .select()
-      .single();
+      .select();
 
     if (error) {
       console.error('Error approving leave request:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
       throw error;
     }
 
-    return data;
+    if (!data || data.length === 0) {
+      throw new Error('No rows were updated. This might be a permissions issue.');
+    }
+
+    console.log('Successfully approved leave request:', data[0]);
+    return data[0];
   }
 
   /**
@@ -155,24 +183,52 @@ export class LeaveService {
     rejectedBy: string | null,
     notes?: string,
   ): Promise<LeaveRequest> {
+    console.log('Rejecting leave request with ID:', id);
+    console.log('Rejected by:', rejectedBy);
+    console.log('Notes:', notes);
+    
+    // First, check if the leave request exists
+    const { data: existingRequest, error: fetchError } = await supabase
+      .from('leave_requests')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (fetchError) {
+      console.error('Error fetching leave request:', fetchError);
+      throw new Error(`Leave request with ID ${id} not found`);
+    }
+    
+    console.log('Found existing leave request:', existingRequest);
+    
+    const updateData = {
+      status: 'rejected',
+      approved_by: rejectedBy, // Using approved_by field for both approval and rejection
+      approved_at: new Date().toISOString(), // Using approved_at for both approval and rejection
+      notes: notes || null,
+    };
+    
+    console.log('Update data:', updateData);
+    
+    // Try the update without .single() first to see if it works
     const { data, error } = await supabase
       .from('leave_requests')
-      .update({
-        status: 'rejected',
-        approved_by: rejectedBy,
-        approved_at: new Date().toISOString(),
-        notes: notes || null,
-      })
+      .update(updateData)
       .eq('id', id)
-      .select()
-      .single();
+      .select();
 
     if (error) {
       console.error('Error rejecting leave request:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
       throw error;
     }
 
-    return data;
+    if (!data || data.length === 0) {
+      throw new Error('No rows were updated. This might be a permissions issue.');
+    }
+
+    console.log('Successfully rejected leave request:', data[0]);
+    return data[0];
   }
 
   /**

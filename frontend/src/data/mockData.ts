@@ -101,6 +101,24 @@ export const staff: Staff[] = [
     weekly_off_day: 5, // Friday
     is_active: true,
   },
+  {
+    id: "staff-9",
+    email: "admin@clinic.com",
+    name: "System Administrator",
+    role: "admin",
+    primary_clinic_id: null, // Admins don't have primary clinics
+    weekly_off_day: null, // Admins don't have weekly off days
+    is_active: true,
+  },
+  {
+    id: "staff-10",
+    email: "hr@clinic.com",
+    name: "HR Manager",
+    role: "admin",
+    primary_clinic_id: null,
+    weekly_off_day: null,
+    is_active: true,
+  },
 ];
 
 // Mock Leave Requests

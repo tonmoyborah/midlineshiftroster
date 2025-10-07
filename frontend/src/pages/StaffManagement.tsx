@@ -17,8 +17,10 @@ export const StaffManagement: React.FC = () => {
   // Separate staff by role
   const doctors = staff.filter((s) => s.role === 'doctor');
   const dentalAssistants = staff.filter((s) => s.role === 'dental_assistant');
+  const admins = staff.filter((s) => s.role === 'admin');
 
-  const getClinicName = (clinicId: string | null) => {
+  const getClinicName = (clinicId: string | null, role: string) => {
+    if (role === 'admin') return 'Not applicable';
     if (!clinicId) return 'No primary clinic';
     const clinic = clinics.find((c) => c.id === clinicId);
     return clinic ? clinic.name : 'Unknown';
@@ -90,7 +92,7 @@ export const StaffManagement: React.FC = () => {
             </p>
             <p>
               <span className="font-medium">Primary Clinic:</span>{' '}
-              {getClinicName(staffMember.primary_clinic_id)}
+              {getClinicName(staffMember.primary_clinic_id, staffMember.role)}
             </p>
             <p>
               <span className="font-medium">Weekly Off:</span>{' '}
@@ -110,7 +112,7 @@ export const StaffManagement: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="px-4 py-4">
+      <div className="py-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Users className="w-6 h-6 text-gray-700" />
@@ -219,6 +221,23 @@ export const StaffManagement: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-3">{dentalAssistants.map(renderStaffCard)}</div>
+              )}
+            </div>
+
+            {/* Admins Section */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">Admins</h2>
+                <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                  {admins.length}
+                </span>
+              </div>
+              {admins.length === 0 ? (
+                <div className="bg-white rounded-xl border border-gray-200 px-4 py-6 text-center">
+                  <p className="text-gray-500 text-sm">No admins added yet</p>
+                </div>
+              ) : (
+                <div className="space-y-3">{admins.map(renderStaffCard)}</div>
               )}
             </div>
           </div>

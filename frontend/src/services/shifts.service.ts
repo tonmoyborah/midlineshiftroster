@@ -13,48 +13,53 @@ export class ShiftsService {
       p_date: dateStr,
     });
 
-    console.log('Roster data:', data, '... ', error, dateStr);
+    console.log('Roster data from database:', data, 'Error:', error, 'Date:', dateStr);
     if (error) {
       console.error('Error fetching roster:', error);
       throw error;
     }
 
     // Transform the data to match our ClinicRoster type
-    return (
-      data?.map((row: any) => ({
+    const transformedData = data?.map((row: any) => {
+      const transformed = {
         clinic: {
           id: row.clinic_id,
           name: row.clinic_name,
           location: row.clinic_location || '',
           is_active: true,
         },
-        // Parse JSONB arrays from database
+        // Parse JSONB arrays from database with individual statuses
         doctors: Array.isArray(row.doctors)
           ? row.doctors.map((doc: any) => ({
               id: doc.id,
               name: doc.name,
-              email: '',
-              role: 'doctor' as const,
-              primary_clinic_id: row.clinic_id,
-              weekly_off_day: null,
-              is_active: true,
+              status: doc.status || 'present',
+              is_visiting: doc.is_visiting || false,
             }))
           : [],
         dental_assistants: Array.isArray(row.dental_assistants)
           ? row.dental_assistants.map((da: any) => ({
               id: da.id,
               name: da.name,
-              email: '',
-              role: 'dental_assistant' as const,
-              primary_clinic_id: row.clinic_id,
-              weekly_off_day: null,
-              is_active: true,
+              status: da.status || 'present',
+              is_visiting: da.is_visiting || false,
             }))
           : [],
-        status: row.status,
         notes: row.notes,
-      })) || []
-    );
+      };
+      
+      console.log(`Clinic ${transformed.clinic.name}:`, {
+        doctors: transformed.doctors.length,
+        dental_assistants: transformed.dental_assistants.length,
+        raw_doctors: row.doctors,
+        raw_dental_assistants: row.dental_assistants
+      });
+      
+      return transformed;
+    }) || [];
+    
+    console.log('Final transformed roster data:', transformedData);
+    return transformedData;
   }
 
   /**
@@ -181,7 +186,7 @@ export class ShiftsService {
           return { ...staff, status: 'unapproved_leave' as const };
         }
 
-        return { ...staff, status: 'available' as const };
+        return { ...staff, status: 'unapproved_leave' as const };
       }),
     );
 
