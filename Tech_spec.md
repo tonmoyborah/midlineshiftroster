@@ -594,6 +594,41 @@ shift-manager/
 └── vite.config.ts
 ```
 
+### 4.2 Global Styles & UI Configuration
+
+**`frontend/src/index.css`**
+
+Global styles are defined to ensure consistent appearance across all devices and browsers:
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f9fafb; /* gray-50 - consistent grayish background */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+```
+
+**Key Design Decisions:**
+- **Consistent Background**: Both `html` and `body` elements use `#f9fafb` (Tailwind's gray-50) to ensure the gutter space and background remain consistent across all devices, preventing system default backgrounds from showing through.
+- **Font Stack**: System font stack for optimal performance and native appearance on each platform.
+- **Font Smoothing**: Antialiasing enabled for better text rendering on both WebKit and Mozilla browsers.
+
+**Color Scheme:**
+- Primary Background: `gray-50` (#f9fafb)
+- Content Areas: `white` (#ffffff)
+- Borders: `gray-200` (#e5e7eb)
+- Text: `gray-900` (#111827) for primary, `gray-600` (#4b5563) for secondary
+
 ---
 
 ## 5. API Layer
