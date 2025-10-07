@@ -5,15 +5,11 @@
 2. [Database Schema](#database-schema)
 3. [Supabase Best Practices](#supabase-best-practices)
 4. [Project Structure](#project-structure)
-5. [UI/UX Design & Layout](#uiux-design--layout)
-6. [API Layer](#api-layer)
-7. [State Management](#state-management)
-8. [Feature Implementation](#feature-implementation)
-9. [Security & Performance](#security-performance)
-10. [Testing Strategy](#testing-strategy)
-11. [Deployment Checklist](#deployment-checklist)
-12. [Future Enhancements](#future-enhancements)
-13. [Recent Fixes and Updates](#recent-fixes-and-updates)
+5. [API Layer](#api-layer)
+6. [State Management](#state-management)
+7. [Feature Implementation](#feature-implementation)
+8. [Security & Performance](#security-performance)
+9. [Testing Strategy](#testing-strategy)
 
 ---
 
@@ -600,66 +596,9 @@ shift-manager/
 
 ---
 
-## 5. UI/UX Design & Layout
+## 5. API Layer
 
-### 5.1 Responsive Layout System
-
-The application uses a responsive container system to ensure optimal viewing experience across different screen sizes and resolutions:
-
-**Container Structure:**
-- **Max Width**: `max-w-7xl` (1280px) for optimal content width on large screens
-- **Horizontal Gutters**: Responsive padding system:
-  - Mobile: `px-4` (16px)
-  - Small screens: `sm:px-6` (24px) 
-  - Large screens: `lg:px-8` (32px)
-- **Auto Centering**: `mx-auto` centers content horizontally
-
-**Implementation:**
-```tsx
-// App.tsx - Main container wrapper
-<div className="min-h-screen bg-gray-50">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <Header title="Shift Manager" />
-    <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
-    <main>{renderPage()}</main>
-  </div>
-</div>
-```
-
-### 5.2 Component Layout Principles
-
-**Consistent Spacing:**
-- Header and Navigation components inherit container padding
-- Page components use `py-4` for vertical spacing
-- Individual cards maintain `px-4 py-4` for internal spacing
-
-**Visual Hierarchy:**
-- Clean white backgrounds for content areas
-- Subtle gradient backgrounds (`bg-gradient-to-br from-slate-50 to-slate-100`)
-- Consistent border styling (`border-gray-200`)
-
-**Accessibility:**
-- Proper contrast ratios maintained
-- Responsive touch targets (minimum 44px)
-- Semantic HTML structure
-
-### 5.3 Layout Benefits
-
-**High-Resolution Displays:**
-- Prevents content from stretching too wide on large monitors
-- Maintains readable line lengths
-- Creates balanced visual composition
-
-**Mobile Responsiveness:**
-- Adapts gracefully to smaller screens
-- Maintains usability across all device sizes
-- Touch-friendly interface elements
-
----
-
-## 6. API Layer
-
-### 6.1 Supabase Client Setup
+### 5.1 Supabase Client Setup
 
 **`src/lib/supabase.ts`**
 ```typescript
@@ -690,7 +629,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 });
 ```
 
-### 6.2 Service Layer Pattern
+### 5.2 Service Layer Pattern
 
 **`src/services/shifts.service.ts`**
 ```typescript
@@ -996,9 +935,9 @@ export class AutoPopulateService {
 
 ---
 
-## 7. State Management
+## 6. State Management
 
-### 7.1 React Query Setup
+### 6.1 React Query Setup
 
 **`src/lib/queryClient.ts`**
 ```typescript
@@ -1020,7 +959,7 @@ export const queryClient = new QueryClient({
 });
 ```
 
-### 7.2 Custom Hooks
+### 6.2 Custom Hooks
 
 **`src/hooks/useShifts.ts`**
 ```typescript
@@ -1108,7 +1047,7 @@ export const useRemoveAssignment = () => {
 };
 ```
 
-### 7.3 Real-time Updates
+### 6.3 Real-time Updates
 
 **`src/hooks/useRealtime.ts`**
 ```typescript
@@ -1156,9 +1095,9 @@ export const useRealtimeShifts = (date: Date) => {
 
 ---
 
-## 8. Feature Implementation
+## 7. Feature Implementation
 
-### 8.1 Daily Shifts View
+### 7.1 Daily Shifts View
 
 **`src/pages/DailyShifts.tsx`**
 ```typescript
@@ -1234,7 +1173,7 @@ export const DailyShifts: React.FC = () => {
 };
 ```
 
-### 8.2 Staff Management
+### 7.2 Staff Management
 
 **`src/pages/StaffManagement.tsx`**
 ```typescript
@@ -1291,43 +1230,21 @@ export const StaffManagement: React.FC = () => {
 };
 ```
 
-### 8.3 Leave Management
+### 7.3 Leave Management
 
 **`src/pages/LeaveManagement.tsx`**
 ```typescript
 import React, { useState } from 'react';
-import { Calendar, Check, X, Clock } from 'lucide-react';
-import { format } from 'date-fns';
-import { useLeaveRequests, useApproveLeave, useRejectLeave } from '../hooks/useLeave';
-import { useAuthContext } from '../contexts/AuthContext';
+import { LeaveRequestList } from '@/components/leave/LeaveRequestList';
+import { useLeaveRequests } from '@/hooks/useLeaveRequests';
+import { Filter } from 'lucide-react';
 
 type LeaveStatus = 'all' | 'pending' | 'approved' | 'rejected';
 
 export const LeaveManagement: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<LeaveStatus>('all');
-  const { user } = useAuthContext();
 
-  const { data: leaveRequests, loading, error, refetch } = useLeaveRequests(statusFilter);
-  const { approveLeave, loading: approving } = useApproveLeave();
-  const { rejectLeave, loading: rejecting } = useRejectLeave();
-
-  const handleApprove = async (id: string) => {
-    const adminId = user?.id || null;
-    const result = await approveLeave(id, adminId, 'Approved by admin');
-
-    if (result) {
-      refetch();
-    }
-  };
-
-  const handleReject = async (id: string) => {
-    const adminId = user?.id || null;
-    const result = await rejectLeave(id, adminId, 'Rejected by admin');
-
-    if (result) {
-      refetch();
-    }
-  };
+  const { data: leaveRequests, isLoading } = useLeaveRequests(statusFilter);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -1366,9 +1283,9 @@ export const LeaveManagement: React.FC = () => {
 
 ---
 
-## 9. Security & Performance
+## 8. Security & Performance
 
-### 9.1 Environment Variables
+### 8.1 Environment Variables
 
 **`.env.example`**
 ```
@@ -1376,7 +1293,7 @@ VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_anon_key
 ```
 
-### 9.2 Authentication
+### 8.2 Authentication
 
 ```typescript
 // src/hooks/useAuth.ts
@@ -1435,7 +1352,7 @@ export const useAuth = () => {
 };
 ```
 
-### 9.3 Error Handling
+### 8.3 Error Handling
 
 ```typescript
 // src/lib/errorHandler.ts
@@ -1471,7 +1388,7 @@ export const handleSupabaseError = (error: any): AppError => {
 };
 ```
 
-### 9.4 Performance Optimization
+### 8.4 Performance Optimization
 
 ```typescript
 // Lazy load routes
@@ -1495,9 +1412,9 @@ const debouncedSearch = useDebouncedValue(search, 300);
 
 ---
 
-## 10. Testing Strategy
+## 9. Testing Strategy
 
-### 10.1 Unit Tests (Vitest)
+### 9.1 Unit Tests (Vitest)
 
 ```typescript
 // src/services/__tests__/shifts.service.test.ts
@@ -1537,7 +1454,7 @@ describe('ShiftsService', () => {
 });
 ```
 
-### 10.2 Integration Tests
+### 9.2 Integration Tests
 
 ```typescript
 // src/hooks/__tests__/useShifts.test.tsx
@@ -1565,7 +1482,7 @@ describe('useRosterForDate', () => {
 });
 ```
 
-### 10.3 E2E Tests (Playwright)
+### 9.3 E2E Tests (Playwright)
 
 ```typescript
 // tests/daily-shifts.spec.ts
@@ -1605,9 +1522,9 @@ test.describe('Daily Shifts', () => {
 
 ---
 
-## 11. Deployment Checklist
+## 10. Deployment Checklist
 
-### 11.1 Pre-deployment
+### 10.1 Pre-deployment
 
 - [ ] Run all migrations on production database
 - [ ] Enable RLS on all tables
@@ -1619,7 +1536,7 @@ test.describe('Daily Shifts', () => {
 - [ ] Run security audit (`npm audit`)
 - [ ] Test on multiple devices/browsers
 
-### 11.2 Monitoring
+### 10.2 Monitoring
 
 - [ ] Set up Supabase logs monitoring
 - [ ] Configure alerts for database errors
@@ -1627,7 +1544,7 @@ test.describe('Daily Shifts', () => {
 - [ ] Track API usage and rate limits
 - [ ] Set up Sentry or similar for error tracking
 
-### 11.3 Performance Targets
+### 10.3 Performance Targets
 
 - First Contentful Paint: < 1.5s
 - Time to Interactive: < 3.5s
@@ -1636,7 +1553,7 @@ test.describe('Daily Shifts', () => {
 
 ---
 
-## 12. Future Enhancements
+## 11. Future Enhancements
 
 ### Phase 2 Features
 - PDF export of shift rosters
@@ -1708,18 +1625,15 @@ export interface LeaveRequest {
   updated_at: string;
 }
 
-export interface StaffInRoster {
-  id: string;
-  name: string;
-  status: StaffStatus;
-  is_visiting: boolean;
-}
-
 export interface ClinicRoster {
-  clinic: Clinic;
-  doctors: StaffInRoster[]; // Individual staff with statuses
-  dental_assistants: StaffInRoster[]; // Individual staff with statuses
+  clinic_id: string;
+  clinic_name: string;
+  doctor_id: string | null;
+  doctor_name: string | null;
+  da_id: string | null;
+  da_name: string | null;
   notes: string | null;
+  status: 'present' | 'visiting' | 'no_staff';
 }
 
 export type StaffStatus = 
@@ -1727,61 +1641,9 @@ export type StaffStatus =
   | 'visiting'
   | 'weekly_off'
   | 'approved_leave'
-  | 'unapproved_leave';
+  | 'unapproved_leave'
+  | 'available';
 ```
-
----
-
-## 13. Recent Fixes and Updates
-
-### 13.1 Leave Management Fixes (December 2024)
-
-**Issue**: Leave approval/rejection functionality was not working due to several issues:
-
-1. **TypeScript Interface Mismatch**: The `LeaveRequest` interface was missing critical database columns (`approved_by`, `approved_at`, `created_at`, `updated_at`)
-2. **Authentication Integration**: The leave management component was passing `null` for admin user ID instead of the authenticated user
-3. **Database Schema Alignment**: Service layer needed to properly handle the database schema
-
-**Fixes Implemented**:
-
-1. **Updated LeaveRequest Interface** (`frontend/src/types/models.ts`):
-   ```typescript
-   export interface LeaveRequest {
-     id: string;
-     staff_id: string;
-     start_date: string;
-     end_date: string;
-     leave_type: 'planned' | 'emergency';
-     reason: string | null;
-     status: 'pending' | 'approved' | 'rejected';
-     approved_by: string | null;      // Added
-     approved_at: string | null;      // Added
-     notes: string | null;
-     created_at: string;              // Added
-     updated_at: string;              // Added
-   }
-   ```
-
-2. **Fixed Authentication Integration** (`frontend/src/pages/LeaveManagement.tsx`):
-   ```typescript
-   import { useAuthContext } from '../contexts/AuthContext';
-   
-   export const LeaveManagement: React.FC = () => {
-     const { user } = useAuthContext();
-     
-     const handleApprove = async (id: string) => {
-       const adminId = user?.id || null;  // Use actual user ID
-       const result = await approveLeave(id, adminId, 'Approved by admin');
-       // ...
-     };
-   };
-   ```
-
-3. **Service Layer Improvements** (`frontend/src/services/leave.service.ts`):
-   - Added proper comments explaining the use of `approved_by` and `approved_at` fields for both approvals and rejections
-   - Maintained database schema compatibility
-
-**Result**: Leave approval and rejection functionality now works correctly with proper authentication tracking and database schema compliance.
 
 ---
 
