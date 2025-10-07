@@ -88,7 +88,7 @@ export const LeaveManagement: React.FC = () => {
   console.log('Leave requests here:', leaveRequests);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-[#dcfce7]">
       <div className="py-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">

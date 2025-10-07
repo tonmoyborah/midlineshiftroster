@@ -609,7 +609,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background-color: #f5f1ed; /* light brownish background - consistent across all devices */
+  background-color: #dcfce7; /* light mint-green background - consistent across all devices */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
@@ -619,12 +619,29 @@ body {
 ```
 
 **Key Design Decisions:**
-- **Consistent Background**: Both `html` and `body` elements use `#f5f1ed` (light brownish/beige) to ensure the gutter space and background remain consistent across all devices, preventing system default backgrounds from showing through.
+- **Consistent Background**: Both `html` and `body` elements use `#dcfce7` (light mint-green) to ensure the gutter space and background remain consistent across all devices, preventing system default backgrounds from showing through. This color provides clearly visible contrast with white cards and components, and is visible regardless of display settings or night light modes.
 - **Font Stack**: System font stack for optimal performance and native appearance on each platform.
 - **Font Smoothing**: Antialiasing enabled for better text rendering on both WebKit and Mozilla browsers.
 
+**Component Background Strategy:**
+
+All components with `min-h-screen` class use the same background color to ensure consistency:
+
+```typescript
+// src/App.tsx, all pages, and auth components use:
+className="min-h-screen bg-[#dcfce7]"
+```
+
+**Files with background applied:**
+- `src/App.tsx` - Main app container
+- `src/components/auth/LoginForm.tsx` - Login screen
+- `src/components/auth/AuthGuard.tsx` - Loading screen
+- `src/pages/DailyShifts.tsx` - Daily shifts page
+- `src/pages/StaffManagement.tsx` - Staff management page
+- `src/pages/LeaveManagement.tsx` - Leave management page
+
 **Color Scheme:**
-- Primary Background: `#f5f1ed` (light brownish/beige)
+- Primary Background: `#dcfce7` (light mint-green - Tailwind green-100)
 - Content Areas: `white` (#ffffff)
 - Borders: `gray-200` (#e5e7eb)
 - Text: `gray-900` (#111827) for primary, `gray-600` (#4b5563) for secondary
