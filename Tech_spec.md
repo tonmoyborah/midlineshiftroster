@@ -1524,32 +1524,111 @@ test.describe('Daily Shifts', () => {
 
 ## 10. Deployment Checklist
 
-### 10.1 Pre-deployment
+### 10.1 TypeScript Build Configuration
 
-- [ ] Run all migrations on production database
+**Important:** The project uses `verbatimModuleSyntax` for strict type imports.
+
+**Type Import Rules:**
+```typescript
+// ✅ Correct - Use 'import type' for types
+import type { ReactNode } from 'react';
+import type { User } from '@supabase/supabase-js';
+import type { Staff, Clinic } from '@/types/models';
+
+// ❌ Wrong - Will fail Vercel build
+import { ReactNode } from 'react';
+import { User } from '@supabase/supabase-js';
+```
+
+**Common Build Fixes:**
+1. Always use `import type` for TypeScript types and interfaces
+2. Ensure all model interfaces include all required properties (created_at, updated_at, etc.)
+3. Use union types (`StaffInRoster[] | Staff[]`) when components accept multiple types
+
+### 10.2 Vercel Deployment Configuration
+
+**File: `vercel.json`**
+```json
+{
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
+
+**Environment Variables (Vercel Dashboard):**
+- `VITE_SUPABASE_URL` - Your Supabase project URL
+- `VITE_SUPABASE_ANON_KEY` - Your Supabase anon/public key
+
+**Build Settings:**
+- Framework: Vite
+- Build Command: `cd frontend && npm install && npm run build`
+- Output Directory: `frontend/dist`
+- Install Command: `npm install`
+
+### 10.3 Pre-deployment
+
+- [ ] Run all migrations on production database (in order):
+  - [ ] `initial_schema_fixed.sql`
+  - [ ] `roster_function_multi_staff.sql`
+  - [ ] `auto_assign_staff.sql`
+  - [ ] `simplified_auth_policies.sql`
 - [ ] Enable RLS on all tables
-- [ ] Configure connection pooling
-- [ ] Set up database backups
-- [ ] Configure CORS in Supabase dashboard
-- [ ] Set up environment variables
-- [ ] Build and test production bundle
-- [ ] Run security audit (`npm audit`)
+- [ ] Configure connection pooling (Transaction mode, pool size: 15)
+- [ ] Set up database backups (auto-enabled in Supabase)
+- [ ] Add Vercel URL to Supabase allowed domains
+- [ ] Set up environment variables in Vercel
+- [ ] Test production build locally: `cd frontend && npm run build && npm run preview`
+- [ ] Run security audit: `npm audit`
+- [ ] Fix TypeScript errors with proper type imports
 - [ ] Test on multiple devices/browsers
 
-### 10.2 Monitoring
+### 10.4 Monitoring
 
+- [ ] Enable Vercel Analytics (free tier)
 - [ ] Set up Supabase logs monitoring
 - [ ] Configure alerts for database errors
 - [ ] Monitor query performance
 - [ ] Track API usage and rate limits
-- [ ] Set up Sentry or similar for error tracking
+- [ ] Set up error tracking (optional: Sentry)
 
-### 10.3 Performance Targets
+### 10.5 Performance Targets
 
 - First Contentful Paint: < 1.5s
 - Time to Interactive: < 3.5s
 - Lighthouse Score: > 90
 - Bundle size: < 500KB (gzipped)
+
+### 10.6 Deployment Workflow
+
+**Automatic Deployment (Recommended):**
+```bash
+# Make changes locally
+git add .
+git commit -m "Feature: Add XYZ"
+git push origin main
+# Vercel auto-deploys in ~2 minutes
+```
+
+**Manual Build Test:**
+```bash
+cd frontend
+npm install
+npm run build
+npm run preview
+# Test at http://localhost:4173
+```
+
+**Supabase URL Configuration:**
+1. Supabase Dashboard → Authentication → URL Configuration
+2. Site URL: `https://your-app.vercel.app`
+3. Redirect URLs: `https://your-app.vercel.app/**`
 
 ---
 

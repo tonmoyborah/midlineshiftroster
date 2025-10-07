@@ -132,6 +132,10 @@ export const leaveRequests: LeaveRequest[] = [
     reason: "Personal",
     status: "pending",
     notes: null,
+    approved_by: null,
+    approved_at: null,
+    created_at: "2025-09-25T10:00:00Z",
+    updated_at: "2025-09-25T10:00:00Z",
   },
   {
     id: "leave-2",
@@ -142,6 +146,10 @@ export const leaveRequests: LeaveRequest[] = [
     reason: "Family emergency",
     status: "approved",
     notes: "Approved by admin",
+    approved_by: "admin-user-1",
+    approved_at: "2025-09-28T14:30:00Z",
+    created_at: "2025-09-26T09:00:00Z",
+    updated_at: "2025-09-28T14:30:00Z",
   },
 ];
 

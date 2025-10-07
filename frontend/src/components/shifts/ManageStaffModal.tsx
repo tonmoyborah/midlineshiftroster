@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { X, Trash2, UserPlus } from 'lucide-react';
-import type { Staff, Clinic } from '../../types/models';
+import type { Staff, Clinic, StaffInRoster } from '../../types/models';
 
 interface ManageStaffModalProps {
   clinic: Clinic | null;
   role: 'doctor' | 'dental_assistant' | null;
-  assignedStaff: Staff[]; // Currently assigned staff
+  assignedStaff: StaffInRoster[] | Staff[]; // Currently assigned staff (accepts both types)
   availableStaff: Staff[]; // All available staff (filtered by status)
   isOpen: boolean;
   onClose: () => void;
