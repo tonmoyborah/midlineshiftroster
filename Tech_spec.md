@@ -609,7 +609,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background-color: #f9fafb; /* gray-50 - consistent grayish background */
+  background-color: #f5f1ed; /* light brownish background - consistent across all devices */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
@@ -619,12 +619,12 @@ body {
 ```
 
 **Key Design Decisions:**
-- **Consistent Background**: Both `html` and `body` elements use `#f9fafb` (Tailwind's gray-50) to ensure the gutter space and background remain consistent across all devices, preventing system default backgrounds from showing through.
+- **Consistent Background**: Both `html` and `body` elements use `#f5f1ed` (light brownish/beige) to ensure the gutter space and background remain consistent across all devices, preventing system default backgrounds from showing through.
 - **Font Stack**: System font stack for optimal performance and native appearance on each platform.
 - **Font Smoothing**: Antialiasing enabled for better text rendering on both WebKit and Mozilla browsers.
 
 **Color Scheme:**
-- Primary Background: `gray-50` (#f9fafb)
+- Primary Background: `#f5f1ed` (light brownish/beige)
 - Content Areas: `white` (#ffffff)
 - Borders: `gray-200` (#e5e7eb)
 - Text: `gray-900` (#111827) for primary, `gray-600` (#4b5563) for secondary
