@@ -23,7 +23,7 @@ export const StaffFormModal: React.FC<StaffFormModalProps> = ({
     name: '',
     email: '',
     role: 'doctor' as 'doctor' | 'dental_assistant' | 'admin',
-    primary_clinic_id: '',
+    primary_clinic_id: null as string | null,
     weekly_off_day: 0,
     is_active: true,
   });
@@ -36,7 +36,7 @@ export const StaffFormModal: React.FC<StaffFormModalProps> = ({
         name: staff.name || '',
         email: staff.email || '',
         role: staff.role || 'doctor',
-        primary_clinic_id: staff.primary_clinic_id || '',
+        primary_clinic_id: staff.primary_clinic_id || null,
         weekly_off_day: staff.weekly_off_day ?? 0,
         is_active: staff.is_active ?? true,
       });
@@ -45,7 +45,7 @@ export const StaffFormModal: React.FC<StaffFormModalProps> = ({
         name: '',
         email: '',
         role: 'doctor',
-        primary_clinic_id: clinics[0]?.id || '',
+        primary_clinic_id: clinics[0]?.id || null,
         weekly_off_day: 0,
         is_active: true,
       });
@@ -79,12 +79,7 @@ export const StaffFormModal: React.FC<StaffFormModalProps> = ({
 
     if (!validate()) return;
 
-    try {
-      await onSubmit(formData);
-      onClose();
-    } catch (error) {
-      console.error('Error submitting form:', error);
-    }
+    await onSubmit(formData);
   };
 
   if (!isOpen) return null;
@@ -153,7 +148,7 @@ export const StaffFormModal: React.FC<StaffFormModalProps> = ({
                 setFormData({
                   ...formData,
                   role: newRole,
-                  primary_clinic_id: newRole === 'admin' ? '' : formData.primary_clinic_id,
+                  primary_clinic_id: newRole === 'admin' ? null : formData.primary_clinic_id,
                 });
               }}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
@@ -171,8 +166,8 @@ export const StaffFormModal: React.FC<StaffFormModalProps> = ({
               Primary Clinic {formData.role !== 'admin' ? '*' : ''}
             </label>
             <select
-              value={formData.primary_clinic_id}
-              onChange={(e) => setFormData({ ...formData, primary_clinic_id: e.target.value })}
+              value={formData.primary_clinic_id || ''}
+              onChange={(e) => setFormData({ ...formData, primary_clinic_id: e.target.value || null })}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
                 errors.primary_clinic_id ? 'border-red-500' : 'border-gray-300'
               }`}

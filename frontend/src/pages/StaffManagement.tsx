@@ -54,7 +54,7 @@ export const StaffManagement: React.FC = () => {
         const result = await updateStaff(editingStaff.id, staffData);
         if (result) {
           await refetch();
-          alert('Staff member updated successfully!');
+          handleCloseModal();
         }
       } else {
         // Create new staff
@@ -63,11 +63,11 @@ export const StaffManagement: React.FC = () => {
         );
         if (result) {
           await refetch();
-          alert('Staff member created successfully!');
+          handleCloseModal();
         }
       }
     } catch (err) {
-      alert(`Error: ${err instanceof Error ? err.message : 'Something went wrong'}`);
+      console.error('Error:', err);
     }
   };
 

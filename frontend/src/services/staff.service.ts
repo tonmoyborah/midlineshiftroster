@@ -34,7 +34,7 @@ export class StaffService {
    * Get staff by ID
    */
   static async getStaffById(id: string): Promise<Staff | null> {
-    const { data, error } = await supabase
+    const { data, error} = await supabase
       .from('staff')
       .select(
         `
@@ -143,3 +143,4 @@ export class StaffService {
     return data || 'available';
   }
 }
+
