@@ -22,7 +22,7 @@ export const LeaveManagement: React.FC = () => {
   const { user } = useAuthContext();
 
   const { data: leaveRequests, loading, error, refetch } = useLeaveRequests(statusFilter);
-  const { data: allStaff, loading: staffLoading } = useStaff();
+  const { data: allStaff } = useStaff();
   const { approveLeave, loading: approving } = useApproveLeave();
   const { rejectLeave, loading: rejecting } = useRejectLeave();
   const { createManualLeave, loading: creatingLeave } = useCreateManualLeave();
