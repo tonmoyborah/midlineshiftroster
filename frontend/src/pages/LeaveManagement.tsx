@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Check, X, Clock, Plus, UserX } from 'lucide-react';
+import { Calendar, Check, X, Clock, Plus, UserX, Link as LinkIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import {
   useLeaveRequests,
@@ -19,6 +19,7 @@ export const LeaveManagement: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<LeaveStatus>('all');
   const [isCreateLeaveModalOpen, setIsCreateLeaveModalOpen] = useState(false);
   const [isMarkAbsenceModalOpen, setIsMarkAbsenceModalOpen] = useState(false);
+  const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
   const { user } = useAuthContext();
 
   const { data: leaveRequests, loading, error, refetch } = useLeaveRequests(statusFilter);
@@ -150,6 +151,14 @@ export const LeaveManagement: React.FC = () => {
     }
   };
 
+  const handleCopyPersonalLink = (staffId: string) => {
+    const personalLink = `${window.location.origin}/my-leaves/${staffId}`;
+    navigator.clipboard.writeText(personalLink).then(() => {
+      setCopiedLinkId(staffId);
+      setTimeout(() => setCopiedLinkId(null), 2000);
+    });
+  };
+
   console.log('Leave requests here:', leaveRequests);
 
   return (
@@ -271,6 +280,33 @@ export const LeaveManagement: React.FC = () => {
                         <span className="font-medium">Notes:</span> {request.notes}
                       </p>
                     )}
+                  </div>
+
+                  {/* Personal Link Button */}
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <button
+                      onClick={() => handleCopyPersonalLink(request.staff_id)}
+                      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors text-xs font-medium ${
+                        copiedLinkId === request.staff_id
+                          ? 'bg-purple-100 text-purple-700'
+                          : 'bg-purple-50 text-purple-600 hover:bg-purple-100'
+                      }`}
+                    >
+                      {copiedLinkId === request.staff_id ? (
+                        <>
+                          <Check className="w-3 h-3" />
+                          Link Copied!
+                        </>
+                      ) : (
+                        <>
+                          <LinkIcon className="w-3 h-3" />
+                          Copy Personal Status Link
+                        </>
+                      )}
+                    </button>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Share this link with {getStaffName(request)} to view all their requests
+                    </p>
                   </div>
 
                   {request.status === 'pending' && (
