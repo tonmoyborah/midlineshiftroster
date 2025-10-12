@@ -1,4 +1,3 @@
-
 # Technical Specification - Midline Shift Roster
 
 ## 1. Overview
@@ -69,14 +68,17 @@ A clean, minimal interface focused on showing a specific day's shift status, not
 
 ### View Shifts (Day-Wise Clinic-Centric View)
 - Select a date (defaults to today)
-- View all 3 clinics with assigned Doctor & DA for that date
+- View all 3 clinics with their status and assigned Doctor & DA for the selected date:
   - ⚠️ No staff (if no staff assigned)
-  - ✅ Present (regular duty)
-  - 🟡 Visiting (inter-branch)
-- Below, a list of the rest of the staff members with status indicators:
-  - ⚠️ Unapproved leave
-  - ❌ On weekly off
+  - ✅ Open (clinic is open and staffed)
+  - 🔒 Closed (clinic is closed for the day)
+
+- Below, display the rest of the staff members with status indicators:
+  - 🔴 Unapproved leave (leave requested but not approved, or marked absent by admin)
+  - 🟣 Weekly off/Holiday
   - 🟣 Approved leave
+  - 🟢 Present (on duty at their primary clinic)
+  - 🟡 Visiting (assigned to another clinic/inter-branch)
 - Optional note per staff (e.g., "Camp duty", "Late arrival")
 
 ### Auto-Populate Shifts
@@ -87,9 +89,21 @@ A clean, minimal interface focused on showing a specific day's shift status, not
 
 ### Leave Management
 - Staff can request leave (date range, type: planned/emergency)
-- Admin can approve/reject
-- Approved leave removes staff from that day’s roster
-- Admin can add approved leave manually as well if staff are not able to request
+- Admin can approve/reject leave requests
+- **Admin can create leaves manually:**
+  - Create approved leaves (pre-approved vacations)
+  - Create pending/unapproved leaves on behalf of staff
+- **Admin can mark unapproved absences:**
+  - Mark staff as absent for specific dates (no-show, etc.)
+  - Uses separate `unapproved_absences` table
+- **Leave Status Hierarchy:**
+  1. **Weekly Off**: Staff's designated weekly off day
+  2. **Approved Leave**: Admin-approved leave requests (status='approved')
+  3. **Unapproved Leave**: Pending leave requests OR manually marked absences
+  4. **Rejected Leave**: Makes staff available/active (not on leave)
+  5. **Present**: Assigned to primary clinic
+  6. **Visiting**: Assigned to non-primary clinic
+  7. **Available**: Active staff, not assigned, no leaves (should be auto-assigned)
 
 ### Inter-Branch Assignment
 - Admin can assign a staff member to another clinic on a specific date
@@ -104,3 +118,8 @@ A clean, minimal interface focused on showing a specific day's shift status, not
 - Change date to view any past or future roster
 - Filter by:
   - Clinic 
+
+
+
+
+

@@ -85,6 +85,10 @@ CREATE INDEX idx_staff_active ON staff(is_active);
 CREATE INDEX idx_staff_email ON staff(email);
 ```
 
+**Important Design Note:** Admin users require entries in **both** the `staff` table (with role='admin') AND the `admin_users` table (which links to `auth.users` for login credentials). These tables are linked only by email, not by foreign keys. 
+
+**Current Implementation:** The staff management UI allows creating staff with role='admin', which creates the entry in the `staff` table. For a fully functional admin account with login credentials, you must also manually create entries in `auth.users` and `admin_users` tables via Supabase Dashboard. See `ADMIN_USER_MANAGEMENT.md` for the complete manual process.
+
 #### `staff_working_days`
 ```sql
 CREATE TABLE staff_working_days (
@@ -125,6 +129,16 @@ CREATE INDEX idx_leave_requests_dates ON leave_requests(start_date, end_date);
 CREATE INDEX idx_leave_requests_status ON leave_requests(status);
 CREATE INDEX idx_leave_requests_date_range ON leave_requests USING GIST (daterange(start_date, end_date, '[]'));
 ```
+
+**Leave Status Behavior:**
+- **pending**: Unapproved leave request - staff shows as "unapproved_leave" status
+- **approved**: Admin-approved leave - staff shows as "approved_leave" status and is removed from roster
+- **rejected**: Rejected leave request - staff is available and can be assigned (no leave status shown)
+
+**Admin Capabilities:**
+- Approve/reject pending leave requests
+- Create manual leaves with any status (pending/approved/rejected)
+- Manually created approved leaves bypass the request workflow
 
 #### `shift_assignments`
 ```sql
@@ -167,6 +181,20 @@ CREATE INDEX idx_unapproved_absences_staff ON unapproved_absences(staff_id);
 CREATE INDEX idx_unapproved_absences_date ON unapproved_absences(absence_date);
 ```
 
+**Purpose:**
+- Separate from leave_requests table - used for tracking ad-hoc absences
+- Admin manually marks staff as absent for specific dates
+- Staff shows as "unapproved_leave" status for marked dates
+
+**Reasons:**
+- **no_show**: Staff did not show up without notice
+- **rejected_leave**: Follow-up marking after rejecting a leave request (if staff still didn't show up)
+
+**Use Cases:**
+- Staff no-show/unannounced absence
+- Documenting attendance issues
+- Separate from the formal leave request/approval workflow
+
 #### `admin_users`
 ```sql
 CREATE TABLE admin_users (
@@ -181,6 +209,28 @@ CREATE TABLE admin_users (
 -- Index
 CREATE INDEX idx_admin_users_email ON admin_users(email);
 ```
+
+**Important:** This table stores system administrators who have login credentials (linked to `auth.users`). Admin users should exist in BOTH this table AND the `staff` table (with role='admin'). The tables are linked by email only.
+
+**Current State:** Creating a staff member with role='admin' in the UI only creates the `staff` table entry. To enable login, you must manually create corresponding entries in `auth.users` (via Supabase Authentication) and this `admin_users` table. See `ADMIN_USER_MANAGEMENT.md` for step-by-step instructions.
+
+### Staff Status Determination Logic
+
+**Status Priority (in order):**
+1. **weekly_off**: Staff's designated weekly off day (from `staff.weekly_off_day`)
+2. **approved_leave**: Leave request with `status='approved'` covering the date
+3. **unapproved_leave**: 
+   - Leave request with `status='pending'` covering the date, OR
+   - Entry in `unapproved_absences` table for the date
+4. **Rejected leaves are ignored**: Leave requests with `status='rejected'` do not affect availability
+5. **present**: Assigned to their primary clinic for the date
+6. **visiting**: Assigned to a non-primary clinic for the date
+7. **available**: Default status - active staff with no assignments, no leaves, not on weekly off (should be auto-assigned)
+
+**Key Rules:**
+- Available staff should be automatically assigned to their primary clinic by the auto-assignment function
+- Rejected leave requests do NOT mark staff as on leave - they become available
+- Unapproved leave encompasses both pending requests and manual absence markings
 
 ### Database Functions
 
@@ -1283,6 +1333,41 @@ export const StaffManagement: React.FC = () => {
 ```
 
 ### 7.3 Leave Management
+
+**Updated: 2025-10-12**
+
+**`src/pages/LeaveManagement.tsx`**
+
+**Features:**
+- View all leave requests with status filtering (all/pending/approved/rejected)
+- Approve/reject pending leave requests
+- **NEW: Create manual leaves** - Admin can create leaves with approved or pending status
+- **NEW: Mark unapproved absences** - Admin can mark staff as absent for specific dates
+- Modal-based UI for leave creation and absence marking
+
+**Admin Capabilities:**
+1. **Approve/Reject Leave Requests**: Standard workflow for staff-submitted requests
+2. **Create Approved Leaves**: Bypass request workflow for pre-approved vacations
+3. **Create Pending Leaves**: Create leave requests on behalf of staff
+4. **Mark Absences**: Record no-shows and unplanned absences separately from leave requests
+
+**`src/services/leave.service.ts`**
+
+**New Methods:**
+- `createManualLeave()`: Create leave request with any status (pending/approved/rejected)
+- `markUnapprovedAbsence()`: Insert entry into unapproved_absences table
+- `removeUnapprovedAbsence()`: Remove absence marking
+- `getUnapprovedAbsences()`: Fetch all manually marked absences
+
+**`src/hooks/useLeave.ts`**
+
+**New Hooks:**
+- `useCreateManualLeave()`: Hook for creating manual leaves
+- `useMarkAbsence()`: Hook for marking absences
+- `useRemoveAbsence()`: Hook for removing absence marks
+- `useUnapprovedAbsences()`: Hook for fetching absence records
+
+**Original Implementation:**
 
 **`src/pages/LeaveManagement.tsx`**
 ```typescript

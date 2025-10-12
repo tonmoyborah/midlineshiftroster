@@ -1,18 +1,32 @@
 import React, { useState } from 'react';
-import { Calendar, Check, X, Clock } from 'lucide-react';
+import { Calendar, Check, X, Clock, Plus, UserX } from 'lucide-react';
 import { format } from 'date-fns';
-import { useLeaveRequests, useApproveLeave, useRejectLeave } from '../hooks/useLeave';
+import {
+  useLeaveRequests,
+  useApproveLeave,
+  useRejectLeave,
+  useCreateManualLeave,
+  useMarkAbsence,
+} from '../hooks/useLeave';
 import { useAuthContext } from '../contexts/AuthContext';
+import { useStaff } from '../hooks/useStaff';
+import { CreateLeaveModal } from '../components/leave/CreateLeaveModal';
+import { MarkAbsenceModal } from '../components/leave/MarkAbsenceModal';
 
 type LeaveStatus = 'all' | 'pending' | 'approved' | 'rejected';
 
 export const LeaveManagement: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<LeaveStatus>('all');
+  const [isCreateLeaveModalOpen, setIsCreateLeaveModalOpen] = useState(false);
+  const [isMarkAbsenceModalOpen, setIsMarkAbsenceModalOpen] = useState(false);
   const { user } = useAuthContext();
 
   const { data: leaveRequests, loading, error, refetch } = useLeaveRequests(statusFilter);
+  const { data: allStaff, loading: staffLoading } = useStaff();
   const { approveLeave, loading: approving } = useApproveLeave();
   const { rejectLeave, loading: rejecting } = useRejectLeave();
+  const { createManualLeave, loading: creatingLeave } = useCreateManualLeave();
+  const { markAbsence, loading: markingAbsence } = useMarkAbsence();
 
   const getStaffName = (request: any) => {
     // The staff info is populated via the join in the service
@@ -85,6 +99,57 @@ export const LeaveManagement: React.FC = () => {
     }
   };
 
+  const handleCreateLeave = async (data: {
+    staffId: string;
+    startDate: string;
+    endDate: string;
+    status: 'pending' | 'approved';
+    leaveType: 'planned' | 'emergency';
+    reason: string;
+    notes: string;
+  }) => {
+    const result = await createManualLeave(
+      data.staffId,
+      data.startDate,
+      data.endDate,
+      data.status,
+      data.leaveType,
+      data.reason,
+      data.notes,
+      user?.id || null,
+    );
+
+    if (result) {
+      console.log('Leave created successfully:', result);
+      setIsCreateLeaveModalOpen(false);
+      refetch();
+    } else {
+      alert('Failed to create leave. Please try again.');
+    }
+  };
+
+  const handleMarkAbsence = async (data: {
+    staffId: string;
+    absenceDate: string;
+    reason: 'no_show' | 'rejected_leave';
+    notes: string;
+  }) => {
+    if (!user?.id) {
+      alert('User not authenticated');
+      return;
+    }
+
+    const result = await markAbsence(data.staffId, data.absenceDate, data.reason, data.notes, user.id);
+
+    if (result) {
+      console.log('Absence marked successfully:', result);
+      setIsMarkAbsenceModalOpen(false);
+      refetch();
+    } else {
+      alert('Failed to mark absence. Please try again.');
+    }
+  };
+
   console.log('Leave requests here:', leaveRequests);
 
   return (
@@ -94,6 +159,22 @@ export const LeaveManagement: React.FC = () => {
           <div className="flex items-center gap-3">
             <Calendar className="w-6 h-6 text-gray-700" />
             <h1 className="text-xl font-semibold text-gray-900">Leave Management</h1>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setIsCreateLeaveModalOpen(true)}
+              className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Create Leave
+            </button>
+            <button
+              onClick={() => setIsMarkAbsenceModalOpen(true)}
+              className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+            >
+              <UserX className="w-4 h-4" />
+              Mark Absence
+            </button>
           </div>
         </div>
 
@@ -216,6 +297,24 @@ export const LeaveManagement: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Create Leave Modal */}
+      <CreateLeaveModal
+        isOpen={isCreateLeaveModalOpen}
+        onClose={() => setIsCreateLeaveModalOpen(false)}
+        onSubmit={handleCreateLeave}
+        staff={allStaff || []}
+        loading={creatingLeave}
+      />
+
+      {/* Mark Absence Modal */}
+      <MarkAbsenceModal
+        isOpen={isMarkAbsenceModalOpen}
+        onClose={() => setIsMarkAbsenceModalOpen(false)}
+        onSubmit={handleMarkAbsence}
+        staff={allStaff || []}
+        loading={markingAbsence}
+      />
     </div>
   );
 };

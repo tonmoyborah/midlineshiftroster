@@ -61,21 +61,29 @@ export const DailyShifts: React.FC = () => {
       // Only auto-assign if no assignments exist for this date
       if (!hasAssignments && roster.length > 0) {
         console.log('No assignments found. Auto-assigning staff...');
-        const result = await autoAssign(selectedDate);
+        try {
+          const result = await autoAssign(selectedDate);
 
-        if (result) {
-          console.log(
-            `✅ Auto-assigned ${result.assigned_count} staff, skipped ${result.skipped_count}`,
-          );
-          // Refresh data
-          await refetchRoster();
-          await refetchUnassigned();
+          if (result) {
+            console.log(
+              `✅ Auto-assigned ${result.assigned_count} staff, skipped ${result.skipped_count}`,
+            );
+            // Refresh data
+            await refetchRoster();
+            await refetchUnassigned();
+          } else {
+            console.warn('⚠️ Auto-assignment returned no result');
+          }
+        } catch (error) {
+          console.error('❌ Auto-assignment failed:', error);
         }
       }
     };
 
     autoAssignIfNeeded();
-  }, [selectedDate, rosterLoading, roster.length]); // Run when date changes or roster loads
+    // Fixed dependencies: removed roster.length, added refetch functions
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate, rosterLoading]);
 
   // Debug logging for staff data
   console.log('DailyShifts Debug:', {

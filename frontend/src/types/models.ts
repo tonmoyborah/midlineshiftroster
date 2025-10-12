@@ -65,10 +65,21 @@ export type StaffStatus =
   | 'visiting'
   | 'weekly_off'
   | 'approved_leave'
-  | 'unapproved_leave';
+  | 'unapproved_leave'
+  | 'available';
 
 export interface StaffWithStatus extends Staff {
   status: StaffStatus;
   assigned_clinic?: Clinic;
   notes?: string;
+}
+
+export interface UnapprovedAbsence {
+  id: string;
+  staff_id: string;
+  absence_date: string;
+  reason: 'no_show' | 'rejected_leave';
+  notes: string | null;
+  marked_by: string;
+  created_at: string;
 }

@@ -49,6 +49,14 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
           textColor: "text-yellow-700",
           iconColor: "text-yellow-600",
         };
+      case "available":
+        return {
+          icon: Circle,
+          text: "Available",
+          bgColor: "bg-blue-50",
+          textColor: "text-blue-700",
+          iconColor: "text-blue-600",
+        };
       default:
         return {
           icon: Circle,

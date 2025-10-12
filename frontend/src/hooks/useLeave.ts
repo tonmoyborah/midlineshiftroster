@@ -122,3 +122,125 @@ export const useDeleteLeaveRequest = () => {
 
   return { deleteLeaveRequest, loading, error };
 };
+
+export const useCreateManualLeave = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const createManualLeave = async (
+    staffId: string,
+    startDate: string,
+    endDate: string,
+    status: 'pending' | 'approved' | 'rejected',
+    leaveType: 'planned' | 'emergency',
+    reason: string,
+    notes: string | null,
+    createdBy: string | null,
+  ) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const leave = await LeaveService.createManualLeave(
+        staffId,
+        startDate,
+        endDate,
+        status,
+        leaveType,
+        reason,
+        notes,
+        createdBy,
+      );
+      return leave;
+    } catch (err) {
+      setError(err as Error);
+      console.error('Error creating manual leave:', err);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { createManualLeave, loading, error };
+};
+
+export const useMarkAbsence = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const markAbsence = async (
+    staffId: string,
+    absenceDate: string,
+    reason: 'no_show' | 'rejected_leave',
+    notes: string | null,
+    markedBy: string,
+  ) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const absence = await LeaveService.markUnapprovedAbsence(
+        staffId,
+        absenceDate,
+        reason,
+        notes,
+        markedBy,
+      );
+      return absence;
+    } catch (err) {
+      setError(err as Error);
+      console.error('Error marking absence:', err);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { markAbsence, loading, error };
+};
+
+export const useRemoveAbsence = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const removeAbsence = async (staffId: string, absenceDate: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await LeaveService.removeUnapprovedAbsence(staffId, absenceDate);
+      return true;
+    } catch (err) {
+      setError(err as Error);
+      console.error('Error removing absence:', err);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { removeAbsence, loading, error };
+};
+
+export const useUnapprovedAbsences = (startDate?: string, endDate?: string) => {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchAbsences = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const absences = await LeaveService.getUnapprovedAbsences(startDate, endDate);
+      setData(absences);
+    } catch (err) {
+      setError(err as Error);
+      console.error('Error fetching unapproved absences:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [startDate, endDate]);
+
+  useEffect(() => {
+    fetchAbsences();
+  }, [fetchAbsences]);
+
+  return { data, loading, error, refetch: fetchAbsences };
+};

@@ -265,4 +265,131 @@ export class LeaveService {
 
     return (data?.length || 0) > 0;
   }
+
+  /**
+   * Create a manual leave request (admin creates on behalf of staff)
+   * Can create approved, pending, or rejected leaves
+   */
+  static async createManualLeave(
+    staffId: string,
+    startDate: string,
+    endDate: string,
+    status: 'pending' | 'approved' | 'rejected',
+    leaveType: 'planned' | 'emergency',
+    reason: string,
+    notes: string | null,
+    createdBy: string | null,
+  ): Promise<LeaveRequest> {
+    const leaveData: any = {
+      staff_id: staffId,
+      start_date: startDate,
+      end_date: endDate,
+      status: status,
+      leave_type: leaveType,
+      reason: reason,
+      notes: notes,
+    };
+
+    // If creating as approved, set approved_by and approved_at
+    if (status === 'approved' && createdBy) {
+      leaveData.approved_by = createdBy;
+      leaveData.approved_at = new Date().toISOString();
+    }
+
+    const { data, error } = await supabase
+      .from('leave_requests')
+      .insert(leaveData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating manual leave:', error);
+      throw error;
+    }
+
+    return data;
+  }
+
+  /**
+   * Mark staff as having unapproved absence for a specific date
+   * Uses the unapproved_absences table
+   */
+  static async markUnapprovedAbsence(
+    staffId: string,
+    absenceDate: string,
+    reason: 'no_show' | 'rejected_leave',
+    notes: string | null,
+    markedBy: string,
+  ): Promise<any> {
+    const { data, error } = await supabase
+      .from('unapproved_absences')
+      .insert({
+        staff_id: staffId,
+        absence_date: absenceDate,
+        reason: reason,
+        notes: notes,
+        marked_by: markedBy,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error marking unapproved absence:', error);
+      throw error;
+    }
+
+    return data;
+  }
+
+  /**
+   * Remove unapproved absence marking
+   */
+  static async removeUnapprovedAbsence(staffId: string, absenceDate: string): Promise<void> {
+    const { error } = await supabase
+      .from('unapproved_absences')
+      .delete()
+      .eq('staff_id', staffId)
+      .eq('absence_date', absenceDate);
+
+    if (error) {
+      console.error('Error removing unapproved absence:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all unapproved absences for a specific date range
+   */
+  static async getUnapprovedAbsences(startDate?: string, endDate?: string): Promise<any[]> {
+    let query = supabase
+      .from('unapproved_absences')
+      .select(
+        `
+        *,
+        staff:staff_id (
+          id,
+          name,
+          role,
+          email
+        )
+      `,
+      )
+      .order('absence_date', { ascending: false });
+
+    if (startDate) {
+      query = query.gte('absence_date', startDate);
+    }
+    if (endDate) {
+      query = query.lte('absence_date', endDate);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching unapproved absences:', error);
+      throw error;
+    }
+
+    return data || [];
+  }
 }

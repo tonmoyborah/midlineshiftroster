@@ -9,18 +9,48 @@ export class ShiftsService {
   static async getRosterForDate(date: Date): Promise<ClinicRoster[]> {
     const dateStr = format(startOfDay(date), 'yyyy-MM-dd');
 
+    console.log(`📅 Fetching roster for date: ${dateStr}`);
+
     const { data, error } = await supabase.rpc('get_clinic_roster_for_date', {
       p_date: dateStr,
     });
 
-    console.log('Roster data from database:', data, 'Error:', error, 'Date:', dateStr);
     if (error) {
-      console.error('Error fetching roster:', error);
+      console.error('❌ Error fetching roster:', error);
       throw error;
+    }
+
+    console.log(`✅ Received ${data?.length || 0} clinics from database`);
+
+    // Validate data format
+    if (data && data.length > 0) {
+      const firstRow = data[0];
+      console.log('🔍 Database response format check:', {
+        has_doctors_array: Array.isArray(firstRow.doctors),
+        has_dental_assistants_array: Array.isArray(firstRow.dental_assistants),
+        doctors_type: typeof firstRow.doctors,
+        dental_assistants_type: typeof firstRow.dental_assistants,
+        sample_clinic: firstRow.clinic_name,
+      });
+
+      // Warn if format is unexpected
+      if (!Array.isArray(firstRow.doctors) || !Array.isArray(firstRow.dental_assistants)) {
+        console.error('⚠️ WARNING: Database returned unexpected format!');
+        console.error('Expected: doctors and dental_assistants as arrays');
+        console.error('Got:', { doctors: firstRow.doctors, dental_assistants: firstRow.dental_assistants });
+      }
     }
 
     // Transform the data to match our ClinicRoster type
     const transformedData = data?.map((row: any) => {
+      // Validate row format
+      if (!Array.isArray(row.doctors)) {
+        console.warn(`⚠️ Clinic ${row.clinic_name}: doctors is not an array, got:`, typeof row.doctors);
+      }
+      if (!Array.isArray(row.dental_assistants)) {
+        console.warn(`⚠️ Clinic ${row.clinic_name}: dental_assistants is not an array, got:`, typeof row.dental_assistants);
+      }
+
       const transformed = {
         clinic: {
           id: row.clinic_id,
@@ -48,17 +78,20 @@ export class ShiftsService {
         notes: row.notes,
       };
       
-      console.log(`Clinic ${transformed.clinic.name}:`, {
+      console.log(`📋 Clinic "${transformed.clinic.name}":`, {
         doctors: transformed.doctors.length,
         dental_assistants: transformed.dental_assistants.length,
-        raw_doctors: row.doctors,
-        raw_dental_assistants: row.dental_assistants
+        doctorNames: transformed.doctors.map((d: any) => d.name),
+        daNames: transformed.dental_assistants.map((da: any) => da.name),
       });
       
       return transformed;
     }) || [];
     
-    console.log('Final transformed roster data:', transformedData);
+    const totalDoctors = transformedData.reduce((sum: number, r: any) => sum + r.doctors.length, 0);
+    const totalDAs = transformedData.reduce((sum: number, r: any) => sum + r.dental_assistants.length, 0);
+    console.log(`📊 Final roster: ${transformedData.length} clinics, ${totalDoctors} doctors, ${totalDAs} dental assistants`);
+    
     return transformedData;
   }
 
@@ -166,7 +199,7 @@ export class ShiftsService {
           return { ...staff, status: 'approved_leave' as const };
         }
 
-        // Check pending leave
+        // Check pending leave (unapproved leave requests)
         // Query: Is dateStr BETWEEN start_date AND end_date?
         const { data: pendingLeave, error: pendingError } = await supabase
           .from('leave_requests')
@@ -186,7 +219,28 @@ export class ShiftsService {
           return { ...staff, status: 'unapproved_leave' as const };
         }
 
-        return { ...staff, status: 'unapproved_leave' as const };
+        // Check unapproved absences (manually marked by admin)
+        const { data: unapprovedAbsence, error: absenceError } = await supabase
+          .from('unapproved_absences')
+          .select('*')
+          .eq('staff_id', staff.id)
+          .eq('absence_date', dateStr)
+          .maybeSingle();
+
+        console.log(`[${staff.name}] [${dateStr}] Unapproved absence check:`, {
+          unapprovedAbsence,
+          absenceError,
+        });
+
+        if (unapprovedAbsence) {
+          return { ...staff, status: 'unapproved_leave' as const };
+        }
+
+        // Check rejected leave - rejected leaves mean staff is available
+        // No need to return unapproved_leave for rejected leaves
+
+        // Default: staff is available (active, not on leave, not on weekly off)
+        return { ...staff, status: 'available' as const };
       }),
     );
 
