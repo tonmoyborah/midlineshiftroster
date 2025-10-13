@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "cd frontend && npm install && vite build",
+    "build": "cd frontend && VITE_SUPABASE_URL=$VITE_SUPABASE_URL VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY npm install && vite build",
     "preview": "vite preview --port 4173",
     "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
     "test": "vitest"
