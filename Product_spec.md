@@ -117,9 +117,98 @@ A clean, minimal interface focused on showing a specific day's shift status, not
 ### Filter & Navigation
 - Change date to view any past or future roster
 - Filter by:
-  - Clinic 
+  - Clinic
 
+### Homepage & Navigation ✅ NEW
 
+**URL:** `/` (Homepage)
 
+A modern, dual-purpose landing page that serves as the main entry point for both administrators and staff members.
 
+**Purpose:**
+- Provide clear, intuitive navigation for two distinct user types
+- No confusion about where to go or what to do
+- Professional, welcoming first impression
 
+**Two Main Sections:**
+
+1. **Admin Portal Card**
+   - Leads to `/admin-login` for secure administrator access
+   - Lists key admin features (shift management, staff management, leave approval)
+   - Requires authentication credentials
+   - Styled with indigo theme to distinguish from staff section
+
+2. **Staff Leave Application Card**
+   - Leads to `/staff-leave-request` for public leave requests
+   - Highlights no-login-required feature
+   - Lists key benefits (quick application, instant reference number)
+   - Styled with green theme matching system branding
+
+**Design Features:**
+- Modern gradient background with green theme
+- Card-based layout with hover effects
+- Responsive design for mobile and desktop
+- Clear iconography (Lucide React icons)
+- Information section showing system capabilities
+- Professional footer
+
+**Navigation Flow:**
+- Homepage (/) → Admin Login (/admin-login) → Admin Dashboard (/admin/shifts)
+- Homepage (/) → Staff Leave Request (/staff-leave-request) → Form submission
+- Back-to-home buttons on all public pages for easy navigation
+
+**Benefits:**
+- Reduces confusion for first-time users
+- Clear separation between admin and staff functions
+- Professional appearance for external-facing system
+- Easy to share homepage URL with staff
+- Mobile-friendly for smartphone access
+
+---
+
+### Staff Leave Application (Self-Service) ✅ NEW
+
+**URL:** `/staff-leave-request`
+
+A public, shareable form where staff can submit leave requests without logging in.
+
+**Features:**
+- **No Login Required**: Open access via shareable URL
+- **Mobile Optimized**: Designed for smartphone usage (primary use case)
+- **Simple Flow**: 
+  1. Select your name from dropdown
+  2. Pick leave start and end dates
+  3. Check if emergency or weekly off
+  4. Provide reason (min 10 characters)
+  5. Submit
+- **Instant Confirmation**: Get unique reference number (e.g., LR-2025-ABC12345)
+- **Admin Approval**: All requests appear in admin Leave Management panel
+- **Status Tracking**: Requests start as "pending" and require admin approval
+
+**Use Cases:**
+- Staff can request leave anytime, anywhere (via smartphone)
+- Reduces back-and-forth calls/texts with admin
+- Provides paper trail for leave requests
+- Reference numbers for tracking and follow-up
+
+**Security:**
+- Anonymous submissions only create pending requests
+- Admin approval required for all leave requests
+- Only active staff can be selected
+- No sensitive data exposed (only staff names visible)
+
+**Integration:**
+- Submissions flow directly into existing Leave Management page
+- Uses existing leave approval/rejection workflow
+- No changes to admin interface needed
+- Follows same leave status rules as manual entries
+
+**Shareable Link:**
+- Can be shared via WhatsApp, SMS, or email
+- Can be printed as QR code for staff room
+- Works on any device with browser
+- No app installation required
+
+---
+
+**End of Product Specification**

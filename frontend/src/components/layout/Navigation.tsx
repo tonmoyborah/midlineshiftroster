@@ -1,19 +1,14 @@
 import React from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Calendar, Users, FileText } from "lucide-react";
 
-interface NavigationProps {
-  currentPage: "shifts" | "staff" | "leave";
-  onPageChange: (page: "shifts" | "staff" | "leave") => void;
-}
-
-export const Navigation: React.FC<NavigationProps> = ({
-  currentPage,
-  onPageChange,
-}) => {
+export const Navigation: React.FC = () => {
+  const location = useLocation();
+  
   const navItems = [
-    { id: "shifts", label: "Shifts", icon: Calendar },
-    { id: "staff", label: "Staff", icon: Users },
-    { id: "leave", label: "Leave", icon: FileText },
+    { id: "shifts", label: "Shifts", icon: Calendar, path: "/admin/shifts" },
+    { id: "staff", label: "Staff", icon: Users, path: "/admin/staff" },
+    { id: "leave", label: "Leave", icon: FileText, path: "/admin/leave" },
   ] as const;
 
   return (
@@ -22,11 +17,11 @@ export const Navigation: React.FC<NavigationProps> = ({
         <div className="flex gap-1">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = currentPage === item.id;
+          const isActive = location.pathname === item.path;
           return (
-            <button
+            <Link
               key={item.id}
-              onClick={() => onPageChange(item.id)}
+              to={item.path}
               className={`flex items-center gap-2 px-4 py-3 font-medium transition-colors relative ${
                 isActive ? "text-gray-900" : "text-gray-500 hover:text-gray-700"
               }`}>
@@ -35,7 +30,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               {isActive && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900" />
               )}
-            </button>
+            </Link>
           );
         })}
         </div>

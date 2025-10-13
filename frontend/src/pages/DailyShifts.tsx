@@ -17,7 +17,7 @@ import { useStaff } from '../hooks/useStaff';
 import type { Clinic } from '../types/models';
 
 export const DailyShifts: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date(2025, 9, 2)); // Oct 2, 2025
+  const [selectedDate, setSelectedDate] = useState(new Date()); // Initialize to today's date
   const [filterClinic, setFilterClinic] = useState<string | null>(null);
 
   // Modal state

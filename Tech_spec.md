@@ -1334,7 +1334,7 @@ export const StaffManagement: React.FC = () => {
 
 ### 7.3 Leave Management
 
-**Updated: 2025-10-12**
+**Updated: 2025-10-13**
 
 **`src/pages/LeaveManagement.tsx`**
 
@@ -1344,6 +1344,13 @@ export const StaffManagement: React.FC = () => {
 - **NEW: Create manual leaves** - Admin can create leaves with approved or pending status
 - **NEW: Mark unapproved absences** - Admin can mark staff as absent for specific dates
 - Modal-based UI for leave creation and absence marking
+- **Mobile-optimized header** - Responsive layout for title and action buttons
+
+**Mobile Responsiveness:**
+- **Header Layout**: Title and buttons stack vertically on mobile (`flex-col`), side-by-side on tablets+ (`sm:flex-row`)
+- **Action Buttons**: Full-width on mobile with centered content, auto-width on desktop
+- **Status Filters**: Wrap to multiple lines on small screens (`flex-wrap`)
+- **Touch Targets**: All buttons sized appropriately for mobile interaction
 
 **Admin Capabilities:**
 1. **Approve/Reject Leave Requests**: Standard workflow for staff-submitted requests
@@ -1860,6 +1867,351 @@ export type StaffStatus =
   | 'unapproved_leave'
   | 'available';
 ```
+
+---
+
+## 12. Staff Self-Service Portal
+
+### 12.0 Homepage & Navigation
+
+**Route:** `/` (Homepage)
+
+**Purpose:** Landing page serving as the main entry point for both admin and staff users
+
+**Status:** ✅ Implemented (October 2025)
+
+#### Overview
+
+The homepage has been redesigned to provide a dual-purpose landing page that serves both administrators and staff members. The page features a modern, card-based interface with clear call-to-action buttons for different user types.
+
+#### Features
+
+**Two Main User Paths:**
+
+1. **Admin Portal** (`/admin-login`)
+   - Secure sign-in for administrators
+   - Access to full shift management, staff management, and leave approval
+   - Requires authentication credentials
+   - Features listed:
+     - Manage daily clinic shifts and assignments
+     - Review and approve leave requests
+     - Monitor staff availability and schedules
+     - Generate reports and manage clinics
+
+2. **Staff Leave Application** (`/staff-leave-request`)
+   - Public access for all staff members
+   - No authentication required
+   - Quick leave request submission
+   - Features listed:
+     - Quick and easy leave application
+     - No login required
+     - Instant submission with reference number
+     - Support for emergency and planned leave
+
+#### Design Highlights
+
+- **Modern UI**: Gradient background (green theme), card-based layout
+- **Responsive Design**: Mobile-friendly, accessible on all devices
+- **Clear Visual Hierarchy**: Distinct color schemes for admin (indigo) and staff (green) sections
+- **Icon-based Navigation**: Uses Lucide React icons for visual clarity
+- **Information Section**: Shows key features (24/7 Access, Staff Management, Smart Scheduling)
+
+#### Routing Structure Update
+
+```typescript
+// App.tsx routing structure
+<Routes>
+  {/* Public routes */}
+  <Route path="/" element={<Home />} />
+  <Route path="/admin-login" element={<AdminLogin />} />
+  <Route path="/staff-leave-request" element={<StaffLeaveApplication />} />
+
+  {/* Protected admin routes - all under /admin/* */}
+  <Route path="/admin/*" element={
+    <AuthGuard>
+      {/* Admin dashboard layout */}
+      <Routes>
+        <Route path="/shifts" element={<DailyShifts />} />
+        <Route path="/staff" element={<StaffManagement />} />
+        <Route path="/leave" element={<LeaveManagement />} />
+      </Routes>
+    </AuthGuard>
+  } />
+</Routes>
+```
+
+#### Navigation Component Update
+
+The Navigation component has been updated to use the new `/admin/*` route structure:
+
+```typescript
+// frontend/src/components/layout/Navigation.tsx
+const navItems = [
+  { id: "shifts", path: "/admin/shifts", icon: Calendar },
+  { id: "staff", path: "/admin/staff", icon: Users },
+  { id: "leave", path: "/admin/leave", icon: FileText },
+];
+```
+
+#### Authentication Flow
+
+1. **User lands on homepage** (`/`)
+2. **Admin clicks "Admin Portal"** → Redirects to `/admin-login`
+3. **Admin signs in** → LoginForm component handles authentication
+4. **On success** → Redirects to `/admin/shifts` (dashboard)
+5. **AuthGuard protects admin routes** → Redirects unauthenticated users to `/admin-login`
+
+#### Back Navigation
+
+Both the Admin Login page and Staff Leave Application page include a "Back to Home" button for easy navigation:
+
+```typescript
+<button onClick={() => navigate('/')}>
+  <ArrowLeft /> Back to Home
+</button>
+```
+
+#### Components
+
+**New Components:**
+- `frontend/src/pages/Home.tsx` - Main landing page
+- `frontend/src/pages/AdminLogin.tsx` - Dedicated admin login page
+
+**Updated Components:**
+- `frontend/src/App.tsx` - Routing structure updated
+- `frontend/src/components/auth/AuthGuard.tsx` - Redirects to `/admin-login`
+- `frontend/src/components/auth/LoginForm.tsx` - Redirects to `/admin/shifts` on success
+- `frontend/src/components/layout/Navigation.tsx` - Updated paths to `/admin/*`
+- `frontend/src/pages/StaffLeaveApplication.tsx` - Added back navigation
+
+#### User Experience
+
+**First-time visitors:**
+- See a welcoming homepage with clear options
+- Understand the system's dual purpose
+- Can choose their path without confusion
+
+**Staff members:**
+- Click "Apply for Leave" card
+- Fill out leave request form
+- Return to homepage or submit another request
+
+**Administrators:**
+- Click "Admin Portal" card
+- Enter credentials on clean login page
+- Access full admin dashboard with all management features
+
+---
+
+### 12.1 Staff Leave Application Form
+
+**Route:** `/staff-leave-request`
+
+**Purpose:** Public-facing form for staff to submit leave requests without authentication
+
+**Status:** ✅ Implemented (October 2025)
+
+#### Overview
+
+The Staff Leave Application Form is a standalone, shareable page that allows staff members to submit leave requests directly without needing to log in. This simplifies the leave request process and reduces administrative burden.
+
+#### Key Features
+
+- **No Authentication Required**: Staff can access the form via a shareable URL
+- **Mobile-First Design**: Optimized for smartphone usage (primary use case)
+- **Simple Workflow**: Select name → Pick dates → Provide reason → Submit
+- **Automatic Status**: All submissions default to `status='pending'` and require admin approval
+- **Reference Number**: Generates a unique reference ID for each submission
+- **Integration**: Seamlessly flows into existing Leave Management admin panel
+
+#### Form Fields
+
+```typescript
+interface StaffLeaveApplicationForm {
+  staff_id: string;           // Dropdown: Select from active staff
+  start_date: string;         // Date picker
+  end_date: string;           // Date picker (min: start_date)
+  is_emergency: boolean;      // Checkbox: Emergency leave
+  is_weekly_off: boolean;     // Checkbox: Weekly off leave
+  reason: string;             // Textarea (required, min 10 chars)
+}
+```
+
+#### Validation Rules
+
+- **Staff Selection**: Required
+- **Date Range**: 
+  - Start date and end date required
+  - End date must be >= start date
+  - Validated client-side and server-side (CHECK constraint)
+- **Reason**: 
+  - Required
+  - Minimum 10 characters
+  - Plain text only
+- **Leave Type**: Automatically determined from `is_emergency` checkbox
+
+#### User Experience Flow
+
+```
+1. Staff opens shareable link → /staff-leave-request
+2. Form loads with active staff dropdown
+3. Staff fills out form fields
+4. Client-side validation on submit
+5. Request created with status='pending'
+6. Success screen shows reference number (e.g., LR-2025-ABC12345)
+7. Admin sees new request in Leave Management panel
+8. Admin approves/rejects
+9. Status updates in system
+```
+
+#### Technical Implementation
+
+**Service Layer:**
+```typescript
+// frontend/src/services/publicLeave.service.ts
+export class PublicLeaveService {
+  static async submitLeaveRequest(data): Promise<Result>
+  static async getActiveStaff(): Promise<StaffList>
+  static async validateStaffId(staffId): Promise<boolean>
+}
+```
+
+**Page Component:**
+```typescript
+// frontend/src/pages/StaffLeaveApplication.tsx
+export const StaffLeaveApplication: React.FC
+```
+
+**Routing:**
+```typescript
+// Public routes (no AuthGuard)
+<Route path="/" element={<Home />} />
+<Route path="/admin-login" element={<AdminLogin />} />
+<Route path="/staff-leave-request" element={<StaffLeaveApplication />} />
+
+// Admin routes (with AuthGuard - under /admin/* path)
+<Route path="/admin/shifts" element={<DailyShifts />} />
+<Route path="/admin/staff" element={<StaffManagement />} />
+<Route path="/admin/leave" element={<LeaveManagement />} />
+```
+
+#### Row Level Security (RLS) Policies
+
+**Required Supabase Policies:**
+
+```sql
+-- Allow anonymous users to INSERT leave requests with status='pending'
+CREATE POLICY "Allow public leave request submissions"
+  ON leave_requests FOR INSERT
+  TO anon
+  WITH CHECK (
+    status = 'pending' AND
+    staff_id IN (SELECT id FROM staff WHERE is_active = true)
+  );
+
+-- Allow anonymous users to view active staff names (for dropdown)
+CREATE POLICY "Allow public to view active staff names"
+  ON staff FOR SELECT
+  TO anon
+  USING (is_active = true);
+```
+
+**Migration File:** `supabase/sql/staff_leave_application_policies.sql`
+
+#### Security Considerations
+
+1. **Access Control**
+   - Anonymous access allowed for form submission only
+   - RLS policies enforce `status='pending'` on all public submissions
+   - Only active staff can be selected
+   - Admin approval required for all requests
+
+2. **Data Privacy**
+   - Public endpoint exposes only: staff ID, name, role
+   - No email addresses, phone numbers, or sensitive data exposed
+   - Leave reasons only visible to authenticated admins
+
+3. **Rate Limiting**
+   - Client-side debouncing on form submission
+   - Future: Consider Supabase Edge Functions for IP-based rate limiting
+   - Future: Add CAPTCHA if abuse detected
+
+4. **Validation**
+   - Client-side validation for UX
+   - Database constraints for data integrity:
+     - `valid_date_range` CHECK constraint
+     - Foreign key constraint on `staff_id`
+     - `status` CHECK constraint
+     - NOT NULL constraints on required fields
+
+#### Integration with Existing System
+
+**Admin Leave Management:**
+- Public submissions appear in existing Leave Management page
+- Standard approval/rejection workflow applies
+- No changes to admin UI required
+- Same leave status determination logic applies
+
+**Roster System:**
+- Pending leaves show staff as "unapproved_leave"
+- Approved leaves remove staff from available pool
+- Rejected leaves make staff available
+- Follows existing status priority hierarchy
+
+**Database:**
+- Uses existing `leave_requests` table
+- No schema changes required
+- Leverages existing indexes and constraints
+- Maintains data consistency with current system
+
+#### Deployment Checklist
+
+- [x] Create `PublicLeaveService` with anonymous submission logic
+- [x] Build `StaffLeaveApplication` page component
+- [x] Update App.tsx routing with React Router
+- [x] Install `react-router-dom` dependency
+- [x] Update Navigation component to use React Router Links
+- [ ] Apply RLS policies in Supabase (run SQL migration)
+- [ ] Test form submission flow
+- [ ] Test mobile responsiveness
+- [ ] Generate shareable URL/QR code
+- [ ] Share link with staff
+
+#### Future Enhancements
+
+- Email/SMS notifications on approval/rejection
+- WhatsApp integration for status updates
+- Staff can view their submission history (optional authentication)
+- File upload for medical certificates
+- Leave balance tracking
+- Multi-language support
+- Dark mode
+- Progressive Web App (PWA) for offline access
+
+#### Shareable URL
+
+**Production URL:** `https://your-domain.vercel.app/staff-leave-request`
+
+**QR Code Generation:**
+Use any QR code generator to create a scannable code linking to the form. Staff can scan and submit from their phones instantly.
+
+#### Reference Number Format
+
+Format: `LR-YYYY-XXXXXXXX`
+
+Example: `LR-2025-A3B7C9D2`
+
+- `LR`: Leave Request prefix
+- `YYYY`: Current year
+- `XXXXXXXX`: First 8 characters of UUID (uppercase)
+
+#### Success Metrics
+
+- **Adoption Rate**: % of staff using form vs calling/texting admin
+- **Time Savings**: Reduction in manual data entry by admin
+- **Error Rate**: Form validation reduces incorrect submissions
+- **Mobile Usage**: Track device types (expected 80%+ mobile)
+- **Submission Volume**: Monitor daily/weekly submission patterns
 
 ---
 

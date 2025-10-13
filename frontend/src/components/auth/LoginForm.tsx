@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
 
 interface LoginFormProps {
@@ -12,6 +13,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const [error, setError] = useState<string | null>(null);
 
   const { signIn } = useAuthContext();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +22,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
 
     try {
       await signIn(email, password);
-      onSuccess?.();
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        // Redirect to admin dashboard on successful login
+        navigate('/admin/shifts');
+      }
     } catch (err: any) {
       setError(err.message || 'An error occurred during login');
     } finally {
