@@ -1437,6 +1437,13 @@ VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_anon_key
 ```
 
+**⚠️ CRITICAL SECURITY NOTES:**
+- **NEVER** use the `service_role` key in frontend code - it bypasses all Row Level Security (RLS) policies
+- **ALWAYS** use the `anon` (public) key in frontend - it enforces RLS and is safe to expose
+- **NEVER** commit API keys directly in source code - always use environment variables
+- The `.env` file is git-ignored - keys should only be in: local `.env`, Vercel env vars, and Supabase dashboard
+- If keys are ever exposed in git history, immediately revoke them in Supabase dashboard and generate new ones
+
 ### 8.2 Authentication
 
 ```typescript
