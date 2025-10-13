@@ -141,38 +141,38 @@ export const StaffLeaveApplication: React.FC = () => {
     };
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-3 sm:p-4">
         <div className="w-full max-w-md">
           {/* Back to Home Button */}
           <button
             onClick={() => navigate('/')}
-            className="mb-4 flex items-center space-x-2 text-gray-700 hover:text-gray-900 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+            className="mb-3 sm:mb-4 flex items-center space-x-2 text-gray-700 hover:text-gray-900 bg-white/80 backdrop-blur-sm px-3 py-2 sm:px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-sm sm:text-base"
           >
-            <Home className="w-5 h-5" />
+            <Home className="w-4 h-4 sm:w-5 sm:h-5" />
             <span className="font-medium">Back to Home</span>
           </button>
 
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-10 h-10 text-green-600" />
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8">
+            <div className="text-center mb-4 sm:mb-6">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" />
               </div>
               
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
                 Leave Request Submitted!
               </h2>
               
-              <p className="text-gray-600">
+              <p className="text-sm sm:text-base text-gray-600 px-2">
                 Your leave request has been sent to the admin for approval.
               </p>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-600 mb-1">Reference Number</p>
-              <p className="text-xl font-mono font-bold text-blue-700">{referenceId}</p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
+              <p className="text-xs sm:text-sm text-gray-600 mb-1">Reference Number</p>
+              <p className="text-lg sm:text-xl font-mono font-bold text-blue-700 break-all">{referenceId}</p>
             </div>
 
-            <div className="text-left bg-gray-50 rounded-lg p-4 mb-6 space-y-2 text-sm">
+            <div className="text-left bg-gray-50 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 space-y-2 text-xs sm:text-sm">
               <p>
                 <span className="font-medium text-gray-700">Staff:</span>{' '}
                 <span className="text-gray-900">{selectedStaff?.name}</span>
@@ -196,47 +196,47 @@ export const StaffLeaveApplication: React.FC = () => {
               </p>
             </div>
 
-            {/* Personal Link Section */}
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-5 mb-6">
-              <div className="flex items-start gap-3 mb-3">
-                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+            {/* Personal Link Section - Mobile Optimized */}
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-3 sm:p-4 md:p-5 mb-4 sm:mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-start gap-3 mb-3">
+                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mx-auto sm:mx-0">
                   <span className="text-lg">🔗</span>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-base font-bold text-gray-900 mb-1">
+                  <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-1 text-center sm:text-left">
                     Your Personal Status Page
                   </h3>
-                  <p className="text-xs text-gray-600 mb-3">
-                    Save this link to check your leave status anytime and view all your requests in one place!
+                  <p className="text-xs text-gray-600 mb-3 text-center sm:text-left">
+                    Save this link to check your leave status anytime!
                   </p>
-                  <div className="bg-white border border-purple-200 rounded-lg p-3 mb-3">
-                    <p className="text-xs font-mono text-gray-700 break-all">
+                  <div className="bg-white border border-purple-200 rounded-lg p-2 sm:p-3 mb-3">
+                    <p className="text-[10px] sm:text-xs font-mono text-gray-700 break-all leading-relaxed">
                       {personalLink}
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <button
                       onClick={handleCopyLink}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white border border-purple-300 text-purple-700 rounded-lg hover:bg-purple-50 transition-colors text-sm font-medium"
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 bg-white border border-purple-300 text-purple-700 rounded-lg hover:bg-purple-50 transition-colors text-sm font-medium touch-manipulation active:scale-95"
                     >
                       {copiedLink ? (
                         <>
                           <Check className="w-4 h-4" />
-                          Copied!
+                          <span>Copied!</span>
                         </>
                       ) : (
                         <>
                           <Copy className="w-4 h-4" />
-                          Copy Link
+                          <span>Copy Link</span>
                         </>
                       )}
                     </button>
                     <button
                       onClick={handleViewStatus}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium touch-manipulation active:scale-95"
                     >
                       <Calendar className="w-4 h-4" />
-                      View Status
+                      <span>View Status</span>
                     </button>
                   </div>
                 </div>
@@ -245,7 +245,7 @@ export const StaffLeaveApplication: React.FC = () => {
 
             <button
               onClick={handleReset}
-              className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+              className="w-full px-4 sm:px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm sm:text-base touch-manipulation active:scale-95"
             >
               Submit Another Request
             </button>
@@ -412,7 +412,7 @@ export const StaffLeaveApplication: React.FC = () => {
                   🔵 This is for my weekly off day
                 </span>
                 <p className="text-xs text-gray-600 mt-0.5">
-                  Check this if you're requesting leave during your regular weekly off
+                  Check this if you're requesting leave to use your regular weekly off
                 </p>
               </div>
             </label>

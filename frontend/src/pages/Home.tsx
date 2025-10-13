@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, FileText, Calendar, Users, Clock, CheckCircle } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -9,15 +10,17 @@ export const Home: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-[#dcfce7] via-[#bbf7d0] to-[#86efac]">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-green-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-green-600 p-2 rounded-lg">
-                <Calendar className="w-8 h-8 text-white" />
-              </div>
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <img 
+                src={logo} 
+                alt="Midline Shift Manager Logo" 
+                className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+              />
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Midline Shift Manager</h1>
-                <p className="text-sm text-gray-600">Clinic Roster & Leave Management System</p>
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 whitespace-nowrap">Midline Shift Manager</h1>
+                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Clinic Roster & Leave Management</p>
               </div>
             </div>
           </div>
@@ -27,12 +30,12 @@ export const Home: React.FC = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Welcome Section */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome to Midline Shift Manager
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 px-4">
+            Simplify Your Clinic Operations
           </h2>
-          <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-            Streamline your clinic operations with efficient roster management and seamless leave applications
+          <p className="text-base sm:text-lg md:text-xl text-gray-700 max-w-2xl mx-auto px-4">
+            Smart scheduling. Quick leave requests. All in one place.
           </p>
         </div>
 
